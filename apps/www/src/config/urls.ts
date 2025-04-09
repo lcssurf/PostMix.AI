@@ -19,6 +19,6 @@ export const siteUrls = {
         github: "/gh",
     },
     demo: {
-        saas: "https://saasdemo.rapidlaunch.xyz",
+        saas: "https://saas.launchmvpfast.com",
     },
 } as const;

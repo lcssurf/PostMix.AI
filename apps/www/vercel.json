@@ -2,11 +2,11 @@
     "redirects": [
         {
             "source": "/github",
-            "destination": "https://github.com/alifarooq9/rapidlaunch"
+            "destination": "https://github.com/alifarooq9/launchmvpfast"
         },
         {
             "source": "/gh",
-            "destination": "https://github.com/alifarooq9/rapidlaunch"
+            "destination": "https://github.com/alifarooq9/launchmvpfast"
         },
         {
             "source": "/alifarooq",
