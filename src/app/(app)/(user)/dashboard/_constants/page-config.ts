@@ -1,4 +1,4 @@
 export const dashboardPageConfig = {
-    title: "Dashboard",
-    description: "Manage your stats of your organization here!",
+    title: "Análise de Perfis",
+    description: "Compare seu perfil com um concorrente e gere conteúdo com IA.",
 } as const;

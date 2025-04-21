@@ -118,7 +118,7 @@ const navigation: SidebarNavItems[] = [
         showLabel: true,
         items: [
             {
-                label: "Dashboard",
+                label: "Análise de Perfis",
                 icon: LayoutDashboardIcon,
                 href: siteUrls.dashboard.home,
             },

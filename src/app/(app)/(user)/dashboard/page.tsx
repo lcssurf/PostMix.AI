@@ -1,3 +1,4 @@
+"use client"
 import { AppPageShell } from "@/app/(app)/_components/page-shell";
 import { dashboardPageConfig } from "@/app/(app)/(user)/dashboard/_constants/page-config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,78 +9,85 @@ import {
     Users2Icon,
 } from "lucide-react";
 
+import { useMultiStep } from "@/components/Stepper/useMultiStep";
+import { Stepper } from "@/components/Stepper/Stepper";
+import { StepProfileInput } from "@/components/Stepper/StepProfileInput";
+import { StepPostSelection } from "@/components/Stepper/StepPostSelection";
+import { StepAnalysisResult } from "@/components/Stepper/StepAnalysisResult";
+import { useState } from "react";
+import { Post } from "@/components/Stepper/PostCard";
+
+const steps = ["profiles", "posts", "analysis"] as const;
+type Step = typeof steps[number];
+
 export default function DashboardPage() {
+
+    const {
+        step,
+        setStep,
+        next,
+        back,
+        steps,
+      } = useMultiStep();
+      
+      const [profileData, setProfileData] = useState({ me: "", competitor: "" });
+      const [selectedPosts, setSelectedPosts] = useState<Post[]>([]);
+      const mockPosts = Array.from({ length: 6 }).map((_, i) => ({
+        id: i,
+        text: `Post ${i + 1} de exemplo com legenda simulada.`,
+      }));
+      
+      const mockAnalysis = {
+        style: "Textos curtos com emojis",
+        hashtags: ["#estratégia", "#marketing", "#postmixai"],
+        frequency: "3 posts por semana",
+      };
+
+      const handleStepClick = (s: string) => {
+        if (steps.includes(s as Step)) {
+          setStep(s as Step);
+        }
+      };
+      
+
     return (
         <AppPageShell
             title={dashboardPageConfig.title}
             description={dashboardPageConfig.description}
         >
-            <div className="grid gap-6">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Revenue
-                            </CardTitle>
-                            <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">$45,231.89</div>
-                            <p className="text-xs text-muted-foreground">
-                                +20.1% from last month
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Subscriptions
-                            </CardTitle>
-                            <Users2Icon className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">+3402</div>
-                            <p className="text-xs text-muted-foreground">
-                                +20.1% from last month
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Active Now
-                            </CardTitle>
-                            <ActivityIcon className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">+304</div>
-                            <p className="text-xs text-muted-foreground">
-                                +20.1% from last month
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Sales
-                            </CardTitle>
-                            <CreditCardIcon className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">+102304</div>
-                            <p className="text-xs text-muted-foreground">
-                                +20.1% from last month
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
+            <div className="space-y-4 mt-6">
+  <Stepper currentStep={step} steps={steps} onStepClick={handleStepClick} />
 
-                <div className="flex min-h-44 w-full items-center justify-center rounded-md border-2 border-dashed border-border p-4">
-                    <p className="text-sm text-muted-foreground">
-                        Your Content here, Above is a dummy data
-                    </p>
-                </div>
-            </div>
+  {step === "profiles" && (
+    <StepProfileInput
+      onSubmit={(data) => {
+        setProfileData(data);
+        next();
+      }}
+    />
+  )}
+
+  {step === "posts" && (
+    <StepPostSelection
+      posts={mockPosts}
+      onNext={(selected) => {
+        setSelectedPosts(selected);
+        next();
+      }}
+    />
+  )}
+
+  {step === "analysis" && (
+    <StepAnalysisResult
+      data={mockAnalysis}
+      onGenerate={() => {
+        // lógica para gerar conteúdo IA
+        console.log("Gerar conteúdo com base nos dados");
+      }}
+    />
+  )}
+</div>
+
         </AppPageShell>
     );
 }
