@@ -32,6 +32,10 @@ export const env = createEnv({
         LEMONSQUEEZY_API_KEY: z.string(),
         LEMONSQUEEZY_STORE_ID: z.string(),
         LEMONSQUEEZY_WEBHOOK_SECRET: z.string(),
+        BRIGHTDATA_API_KEY: z.string(),
+        BRIGHTDATA_DATASET_ID: z.string(),
+        DATASET_ID_INSTAGRAM: z.string(),
+        DATASET_ID_TIKTOK: z.string(),
     },
 
     /**
@@ -68,6 +72,11 @@ export const env = createEnv({
         NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
         NEXT_PUBLIC_WAITLIST_MODE: process.env.NEXT_PUBLIC_WAITLIST_MODE,
         NEXT_PUBLIC_MAINTENANCE_MODE: process.env.NEXT_PUBLIC_MAINTENANCE_MODE,
+
+        BRIGHTDATA_API_KEY: process.env.BRIGHTDATA_API_KEY,
+        BRIGHTDATA_DATASET_ID: process.env.BRIGHTDATA_DATASET_ID,
+        DATASET_ID_INSTAGRAM: process.env.DATASET_ID_INSTAGRAM,
+        DATASET_ID_TIKTOK: process.env.DATASET_ID_TIKTOK,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

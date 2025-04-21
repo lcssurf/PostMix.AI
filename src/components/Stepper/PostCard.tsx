@@ -9,15 +9,17 @@ type PostCardProps = {
   post: Post;
   selected: boolean;
   toggleSelect: () => void;
+  disabled?: boolean;
 };
 
-export function PostCard({ post, selected, toggleSelect }: PostCardProps) {
+export function PostCard({ post, selected, toggleSelect, disabled }: PostCardProps) {
   return (
     <div
-      onClick={toggleSelect}
+      onClick={!disabled ? toggleSelect : undefined}
       className={cn(
-        "border p-4 rounded-lg cursor-pointer transition",
-        selected ? "border-primary bg-primary/10" : "border-border"
+        "border p-4 rounded-lg transition",
+        selected ? "border-primary bg-primary/10" : "border-border",
+        disabled ? "opacity-50 cursor-default pointer-events-none select-none" : "cursor-pointer"
       )}
     >
       <p className="text-sm font-medium">{post.text}</p>

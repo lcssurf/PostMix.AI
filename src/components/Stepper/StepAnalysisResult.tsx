@@ -1,5 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type AnalysisResult = {
   style: string;
@@ -10,11 +11,12 @@ type AnalysisResult = {
 type Props = {
   data: AnalysisResult;
   onGenerate: () => void;
+  disabled?: boolean;
 };
 
-export function StepAnalysisResult({ data, onGenerate }: Props) {
+export function StepAnalysisResult({ data, onGenerate, disabled }: Props) {
   return (
-    <Card>
+    <Card className={cn(disabled && "opacity-50 pointer-events-none select-none")}>
       <CardHeader>
         <CardTitle>Resultado da Análise</CardTitle>
       </CardHeader>
@@ -28,7 +30,9 @@ export function StepAnalysisResult({ data, onGenerate }: Props) {
         <p>
           <strong>Frequência de postagem:</strong> {data.frequency}
         </p>
-        <Button onClick={onGenerate}>Gerar conteúdo com IA</Button>
+        {!disabled && (
+          <Button onClick={onGenerate}>Gerar conteúdo com IA</Button>
+        )}
       </CardContent>
     </Card>
   );

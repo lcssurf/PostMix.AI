@@ -1,20 +1,28 @@
 import { useState } from "react";
 
 const steps = ["profiles", "posts", "analysis"] as const;
-type Step = typeof steps[number];
+export type Step = typeof steps[number];
 
 export function useMultiStep() {
-  const [step, setStep] = useState<Step>("profiles");
+  const [stepIndex, setStepIndex] = useState(0);
 
-  const next = () => {
-    const currentIndex = steps.indexOf(step);
-    if (currentIndex < steps.length - 1) setStep(steps[currentIndex + 1] as Step);
+  const next = () => setStepIndex((i) => Math.min(i + 1, steps.length - 1));
+  const back = () => setStepIndex((i) => Math.max(i - 1, 0));
+  const goTo = (index: number) => {
+    if (index >= 0 && index < steps.length) {
+      setStepIndex(index);
+    }
   };
 
-  const back = () => {
-    const currentIndex = steps.indexOf(step);
-    if (currentIndex > 0) setStep(steps[currentIndex - 1] as Step);
-  };
+  const isStepEnabled = (index: number) => index <= stepIndex;
 
-  return { step, setStep, next, back, steps };
+  return {
+    stepIndex,
+    currentStep: steps[stepIndex],
+    steps,
+    next,
+    back,
+    goTo,
+    isStepEnabled,
+  };
 }

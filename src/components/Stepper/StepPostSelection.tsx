@@ -2,13 +2,15 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Post, PostCard } from "./PostCard";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   posts: Post[];
   onNext: (selected: Post[]) => void;
+  disabled?: boolean;
 };
 
-export function StepPostSelection({ posts, onNext }: Props) {
+export function StepPostSelection({ posts, onNext, disabled }: Props) {
   const [selected, setSelected] = useState<number[]>([]);
 
   const toggle = (id: number) => {
@@ -18,7 +20,7 @@ export function StepPostSelection({ posts, onNext }: Props) {
   };
 
   return (
-    <Card>
+    <Card className={cn(disabled && "opacity-50 pointer-events-none select-none")}>
       <CardHeader>
         <CardTitle>Selecione os posts para análise</CardTitle>
       </CardHeader>
@@ -29,13 +31,21 @@ export function StepPostSelection({ posts, onNext }: Props) {
             post={post}
             selected={selected.includes(post.id)}
             toggleSelect={() => toggle(post.id)}
+            disabled={disabled}
           />
         ))}
-        <div className="col-span-full">
-          <Button onClick={() => onNext(posts.filter((p) => selected.includes(p.id)))} disabled={selected.length === 0}>
-            Analisar
-          </Button>
-        </div>
+        {!disabled && (
+          <div className="col-span-full">
+            <Button
+              onClick={() =>
+                onNext(posts.filter((p) => selected.includes(p.id)))
+              }
+              disabled={selected.length === 0}
+            >
+              Analisar
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

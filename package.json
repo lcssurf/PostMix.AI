@@ -38,6 +38,7 @@
         "@tanstack/react-table": "^8.16.0",
         "@types/mdx": "^2.0.13",
         "@uploadthing/react": "^6.4.4",
+        "axios": "^1.8.4",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.0",
         "cmdk": "^0.2.1",
