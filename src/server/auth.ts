@@ -130,15 +130,16 @@ export const authOptions: NextAuthOptions = {
             async sendVerificationRequest(params) {
                 return await sendVerificationEmail({ params });
             },
-        }),
-        GoogleProvider({
-            clientId: env.GOOGLE_CLIENT_ID,
-            clientSecret: env.GOOGLE_CLIENT_SECRET,
-        }),
-        GithubProvider({
-            clientId: env.GITHUB_CLIENT_ID,
-            clientSecret: env.GITHUB_CLIENT_SECRET,
-        }),
+        })
+        ,
+        // GoogleProvider({
+        //     clientId: env.GOOGLE_CLIENT_ID,
+        //     clientSecret: env.GOOGLE_CLIENT_SECRET,
+        // }),
+        // GithubProvider({
+        //     clientId: env.GITHUB_CLIENT_ID,
+        //     clientSecret: env.GITHUB_CLIENT_SECRET,
+        // }),
         /**
          * ...add more providers here.
          *
