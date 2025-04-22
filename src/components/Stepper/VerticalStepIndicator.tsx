@@ -11,14 +11,15 @@ export function VerticalStepIndicator({ steps, currentIndex }: Props) {
       {steps.map((step, index) => {
         const isActive = index === currentIndex;
         const isCompleted = index < currentIndex;
+        const isPending = index > currentIndex;
 
         return (
           <div
             key={step}
             className={cn(
-              "flex items-center gap-2 md:gap-3",
-              "text-sm transition-colors",
-              isActive ? "text-primary" : "text-muted-foreground"
+              "flex items-center gap-2 md:gap-3 text-sm transition-opacity",
+              isActive ? "text-primary" : "text-muted-foreground",
+              isPending && "opacity-40 cursor-not-allowed select-none"
             )}
           >
             <div

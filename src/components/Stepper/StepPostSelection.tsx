@@ -1,3 +1,4 @@
+// StepPostSelection.tsx
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Post, PostCard } from "./PostCard";
@@ -11,25 +12,31 @@ type Props = {
 };
 
 export function StepPostSelection({ posts, onNext, disabled }: Props) {
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
 
-  const toggle = (id: number) => {
+  const toggle = (id: string | number) => {
+    const strId = String(id);
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(strId) ? prev.filter((i) => i !== strId) : [...prev, strId].slice(0, 3)
     );
   };
 
   return (
-    <Card className={cn(disabled && "opacity-50 pointer-events-none select-none")}>
+    <Card
+      className={cn(
+        disabled &&
+        "pointer-events-none select-none blur-sm grayscale overflow-hidden"
+      )}
+    >
       <CardHeader>
-        <CardTitle>Selecione os posts para análise</CardTitle>
+        <CardTitle>📸 Selecione até 3 posts para análise</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {posts.map((post) => (
           <PostCard
             key={post.id}
             post={post}
-            selected={selected.includes(post.id)}
+            selected={selected.includes(String(post.id))}
             toggleSelect={() => toggle(post.id)}
             disabled={disabled}
           />
@@ -37,9 +44,7 @@ export function StepPostSelection({ posts, onNext, disabled }: Props) {
         {!disabled && (
           <div className="col-span-full">
             <Button
-              onClick={() =>
-                onNext(posts.filter((p) => selected.includes(p.id)))
-              }
+              onClick={() => onNext(posts.filter((p) => selected.includes(String(p.id))))}
               disabled={selected.length === 0}
             >
               Analisar

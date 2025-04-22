@@ -8,7 +8,6 @@ import * as z from "zod";
 import { cn } from "@/lib/utils";
 
 const schema = z.object({
-  me: z.string().min(2),
   competitor: z.string().min(2),
 });
 
@@ -27,20 +26,21 @@ export function StepProfileInput({ onSubmit, disabled }: Props) {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   return (
-    <Card className={cn(disabled && "opacity-50 pointer-events-none select-none")}>
+    <Card
+      className={cn(
+        disabled &&
+          "opacity-50 pointer-events-none select-none blur-sm grayscale overflow-hidden"
+      )}
+    >
       <CardHeader>
-        <CardTitle>Perfis para análise</CardTitle>
+        <CardTitle>📌 Perfil de referência</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Input
-          placeholder="@seu_perfil"
-          {...register("me")}
-          readOnly={disabled}
-        />
-        <Input
-          placeholder="@concorrente"
+          placeholder="@perfil_concorrente"
           {...register("competitor")}
           readOnly={disabled}
+          disabled={disabled}
         />
         {!disabled && (
           <Button onClick={handleSubmit(onSubmit)}>Buscar posts</Button>
