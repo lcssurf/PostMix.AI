@@ -98,7 +98,7 @@ export default function DashboardPage() {
         const cacheAge = now - (parsed._cachedAt || 0);
 
         // Verifica se o cache ainda é válido (1 hora = 3600000ms, 30 minutos = 1800000ms)
-        if (cacheAge < 10000) { // 10000ms = 10s
+        if (cacheAge < 3600000) { // 10000ms = 10s
           setReferenceProfile(parsed);
           setReferencePosts(parsed.posts || []);
           setReferenceUsername(sanitized);
