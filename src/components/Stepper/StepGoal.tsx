@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -14,9 +15,13 @@ interface StepGoalProps {
   value?: string;
   onSelect: (goal: string) => void;
   disabled?: boolean;
+  completed?: boolean;
+  loading?: boolean;
 }
 
-export function StepGoal({ value, onSelect, disabled }: StepGoalProps) {
+export function StepGoal({ value, onSelect, disabled, completed, loading }: StepGoalProps) {
+  const [tempGoal, setTempGoal] = useState(value || "");
+
   return (
     <div
       className={cn(
@@ -32,9 +37,9 @@ export function StepGoal({ value, onSelect, disabled }: StepGoalProps) {
             key={g.value}
             className={cn(
               "cursor-pointer transition-all",
-              value === g.value && "ring-2 ring-primary"
+              tempGoal === g.value && "ring-2 ring-primary"
             )}
-            onClick={() => !disabled && onSelect(g.value)}
+            onClick={() => !disabled && !completed && setTempGoal(g.value)}
           >
             <CardContent className="p-4 text-sm font-medium">
               {g.label}
@@ -42,9 +47,14 @@ export function StepGoal({ value, onSelect, disabled }: StepGoalProps) {
           </Card>
         ))}
       </div>
-      {value && (
-        <Button onClick={() => onSelect(value)} disabled={disabled} className="mt-4">
-          Continuar
+
+      {tempGoal && (
+        <Button
+          onClick={() => onSelect(tempGoal)}
+          disabled={disabled || loading || completed}
+          className="mt-4"
+        >
+          {loading ? "Carregando..." : completed ? "Concluído" : "Continuar"}
         </Button>
       )}
     </div>

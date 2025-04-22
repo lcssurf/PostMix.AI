@@ -16,9 +16,12 @@ type FormData = z.infer<typeof schema>;
 type Props = {
   onSubmit: (data: FormData) => void;
   disabled?: boolean;
+  loading?: boolean;
+  error?: string;
+  completed?: boolean; // Prop to indicate if this step is already completed
 };
 
-export function StepProfileInput({ onSubmit, disabled }: Props) {
+export function StepProfileInput({ onSubmit, disabled, loading, error, completed }: Props) {
   const {
     register,
     handleSubmit,
@@ -29,7 +32,7 @@ export function StepProfileInput({ onSubmit, disabled }: Props) {
     <Card
       className={cn(
         disabled &&
-          "opacity-50 pointer-events-none select-none blur-sm grayscale overflow-hidden"
+        "opacity-50 pointer-events-none select-none blur-sm grayscale overflow-hidden"
       )}
     >
       <CardHeader>
@@ -42,9 +45,10 @@ export function StepProfileInput({ onSubmit, disabled }: Props) {
           readOnly={disabled}
           disabled={disabled}
         />
-        {!disabled && (
-          <Button onClick={handleSubmit(onSubmit)}>Buscar posts</Button>
-        )}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+
+        <Button onClick={handleSubmit(onSubmit)} disabled={disabled || loading || completed}>{loading ? "Carregando..." : completed ? "Concluído" : "Buscar posts"}</Button>
+
       </CardContent>
     </Card>
   );

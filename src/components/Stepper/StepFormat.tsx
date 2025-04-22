@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,9 +15,13 @@ interface StepFormatProps {
   value?: string;
   onSelect: (format: string) => void;
   disabled?: boolean;
+  completed?: boolean;
+  loading?: boolean;
 }
 
-export function StepFormat({ value, onSelect, disabled }: StepFormatProps) {
+export function StepFormat({ value, onSelect, disabled, completed, loading }: StepFormatProps) {
+  const [tempFormat, setTempFormat] = useState(value || "");
+
   return (
     <div
       className={cn(
@@ -32,9 +37,9 @@ export function StepFormat({ value, onSelect, disabled }: StepFormatProps) {
             key={format.value}
             className={cn(
               "cursor-pointer transition-all",
-              value === format.value && "ring-2 ring-primary"
+              tempFormat === format.value && "ring-2 ring-primary"
             )}
-            onClick={() => !disabled && onSelect(format.value)}
+            onClick={() => !disabled && !completed && setTempFormat(format.value)}
           >
             <CardContent className="p-4 text-sm font-medium">
               {format.label}
@@ -42,9 +47,13 @@ export function StepFormat({ value, onSelect, disabled }: StepFormatProps) {
           </Card>
         ))}
       </div>
-      {value && (
-        <Button onClick={() => onSelect(value)} disabled={disabled} className="mt-4">
-          Gerar conteúdo
+      {tempFormat && (
+        <Button
+          onClick={() => onSelect(tempFormat)}
+          disabled={disabled || loading || completed}
+          className="mt-4"
+        >
+          {loading ? "Carregando..." : completed ? "Concluído" : "Continuar"}
         </Button>
       )}
     </div>

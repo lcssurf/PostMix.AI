@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,9 +15,13 @@ interface StepToneProps {
   value?: string;
   onSelect: (tone: string) => void;
   disabled?: boolean;
+  completed?: boolean;
+  loading?: boolean;
 }
 
-export function StepTone({ value, onSelect, disabled }: StepToneProps) {
+export function StepTone({ value, onSelect, disabled, completed, loading }: StepToneProps) {
+  const [tempTone, setTempTone] = useState(value || "");
+
   return (
     <div
       className={cn(
@@ -32,9 +37,9 @@ export function StepTone({ value, onSelect, disabled }: StepToneProps) {
             key={tone.value}
             className={cn(
               "cursor-pointer transition-all",
-              value === tone.value && "ring-2 ring-primary"
+              tempTone === tone.value && "ring-2 ring-primary"
             )}
-            onClick={() => !disabled && onSelect(tone.value)}
+            onClick={() => !disabled && !completed && setTempTone(tone.value)}
           >
             <CardContent className="p-4 text-sm font-medium">
               {tone.label}
@@ -42,9 +47,13 @@ export function StepTone({ value, onSelect, disabled }: StepToneProps) {
           </Card>
         ))}
       </div>
-      {value && (
-        <Button onClick={() => onSelect(value)} disabled={disabled} className="mt-4">
-          Continuar
+      {tempTone && (
+        <Button
+          onClick={() => onSelect(tempTone)}
+          disabled={disabled || loading || completed}
+          className="mt-4"
+        >
+          {loading ? "Carregando..." : completed ? "Concluído" : "Continuar"}
         </Button>
       )}
     </div>

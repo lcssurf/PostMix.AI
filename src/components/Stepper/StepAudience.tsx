@@ -7,19 +7,27 @@ interface StepAudienceProps {
   defaultValue?: string;
   onNext: (audience: string) => void;
   disabled?: boolean;
+  loading?: boolean;
+  completed?: boolean;
 }
 
-export function StepAudience({ defaultValue = "", onNext, disabled }: StepAudienceProps) {
+export function StepAudience({ defaultValue = "", onNext, disabled, loading, completed }: StepAudienceProps) {
   const [audience, setAudience] = useState(defaultValue);
+
+  const handleSubmit = () => {
+    if (!disabled && !completed && audience.trim()) {
+      onNext(audience.trim());
+    }
+  };
 
   return (
     <div
-          className={cn(
-            "space-y-4",
-            disabled &&
-              "pointer-events-none select-none blur-sm grayscale overflow-hidden"
-          )}
-        >
+      className={cn(
+        "space-y-4",
+        disabled &&
+          "pointer-events-none select-none blur-sm grayscale overflow-hidden"
+      )}
+    >
       <h2 className="text-lg font-semibold">👤 Quem é o seu público-alvo?</h2>
       <Textarea
         placeholder="Ex: Mulheres acima de 40 anos com dor lombar..."
@@ -27,8 +35,8 @@ export function StepAudience({ defaultValue = "", onNext, disabled }: StepAudien
         onChange={(e) => setAudience(e.target.value)}
         disabled={disabled}
       />
-      <Button onClick={() => onNext(audience)} disabled={disabled || !audience.trim()}>
-        Continuar
+      <Button onClick={handleSubmit} disabled={disabled || !audience.trim() || loading || completed}>
+        {loading ? "Carregando..." : completed ? "Concluído" : "Continuar"}
       </Button>
     </div>
   );

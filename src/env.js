@@ -36,6 +36,7 @@ export const env = createEnv({
         BRIGHTDATA_DATASET_ID: z.string(),
         DATASET_ID_INSTAGRAM: z.string(),
         DATASET_ID_TIKTOK: z.string(),
+        OPENROUTER_API_KEY:z.string()
     },
 
     /**
@@ -77,6 +78,8 @@ export const env = createEnv({
         BRIGHTDATA_DATASET_ID: process.env.BRIGHTDATA_DATASET_ID,
         DATASET_ID_INSTAGRAM: process.env.DATASET_ID_INSTAGRAM,
         DATASET_ID_TIKTOK: process.env.DATASET_ID_TIKTOK,
+
+        OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

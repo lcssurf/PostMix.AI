@@ -1,4 +1,3 @@
-// StepPostSelection.tsx
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Post, PostCard } from "./PostCard";
@@ -9,9 +8,26 @@ type Props = {
   posts: Post[];
   onNext: (selected: Post[]) => void;
   disabled?: boolean;
+  completed?: boolean;
+  loading?: boolean;
+  profile?: {
+    profile_image_link: string;
+    profile_url: string;
+    profile_name: string | null;
+    account: string;
+    biography?: string;
+    followers?: number;
+    following?: number;
+    posts_count?: number;
+    is_verified?: boolean;
+    is_business_account?: boolean;
+    category_name?: string;
+    external_url?: string[];
+  };
+
 };
 
-export function StepPostSelection({ posts, onNext, disabled }: Props) {
+export function StepPostSelection({ posts, onNext, disabled, completed, loading, profile }: Props) {
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggle = (id: string | number) => {
@@ -20,6 +36,10 @@ export function StepPostSelection({ posts, onNext, disabled }: Props) {
       prev.includes(strId) ? prev.filter((i) => i !== strId) : [...prev, strId].slice(0, 3)
     );
   };
+
+  const proxiedImage = profile?.profile_image_link
+    ? `/api/proxy-image?url=${encodeURIComponent(profile.profile_image_link)}`
+    : undefined;
 
   return (
     <Card
@@ -30,7 +50,73 @@ export function StepPostSelection({ posts, onNext, disabled }: Props) {
     >
       <CardHeader>
         <CardTitle>📸 Selecione até 3 posts para análise</CardTitle>
+
+        {profile && (
+          <div className="flex items-start gap-4 p-4 border rounded-xl bg-muted/30 mt-4">
+            <img
+              src={proxiedImage}
+              alt={profile.profile_name || profile.account}
+              className="w-14 h-14 rounded-full object-cover border"
+            />
+            <div className="flex flex-col text-sm gap-0.5">
+              <div>
+                <a
+                  href={profile.profile_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold hover:underline"
+                >
+                  @{profile.account}
+                </a>
+                {profile.profile_name && (
+                  <span className="ml-2 text-muted-foreground">{profile.profile_name}</span>
+                )}
+              </div>
+
+              {profile.followers !== undefined && (
+                <span className="text-xs text-muted-foreground">
+                  {profile.followers.toLocaleString()} seguidores
+                </span>
+              )}
+
+              {profile.posts_count !== undefined && (
+                <span className="text-xs text-muted-foreground">
+                  {profile.posts_count} publicações
+                </span>
+              )}
+
+              {profile.following !== undefined && (
+                <span className="text-xs text-muted-foreground">
+                  Seguindo {profile.following.toLocaleString()}
+                </span>
+              )}
+
+              {profile.category_name && (
+                <span className="text-xs text-muted-foreground">{profile.category_name}</span>
+              )}
+
+              {profile.biography && (
+                <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                  {profile.biography}
+                </p>
+              )}
+
+              {(profile.external_url ?? []).length > 0 && (
+                <a
+                  href={profile.external_url?.[0]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-500 hover:underline break-all mt-1"
+                >
+                  🔗 {profile.external_url?.[0]}
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
       </CardHeader>
+
       <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {posts.map((post) => (
           <PostCard
@@ -44,10 +130,12 @@ export function StepPostSelection({ posts, onNext, disabled }: Props) {
         {!disabled && (
           <div className="col-span-full">
             <Button
-              onClick={() => onNext(posts.filter((p) => selected.includes(String(p.id))))}
-              disabled={selected.length === 0}
+              onClick={() =>
+                onNext(posts.filter((p) => selected.includes(String(p.id))))
+              }
+              disabled={selected.length === 0 || loading || completed}
             >
-              Analisar
+              {loading ? "Carregando..." : completed ? "Concluído" : "Analisar"}
             </Button>
           </div>
         )}
