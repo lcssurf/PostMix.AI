@@ -1,7 +1,4 @@
-export const routeSegmentConfig = {
-  runtime: "nodejs", // permite fetch e mais tempo para execução
-  maxDuration: 60,   // 60 segundos (seu plano Vercel Pro permite)
-};
+export const maxDuration = 60; // 60 segundos (seu plano Vercel Pro permite)
 
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
