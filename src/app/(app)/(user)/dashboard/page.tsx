@@ -142,7 +142,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const ref = stepRefs[stepIndex]?.current;
     if (ref) {
-      ref.scrollIntoView({ behavior: "smooth", block: "start" });
+      ref.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   }, [stepIndex]);
 
@@ -154,6 +154,15 @@ export default function DashboardPage() {
     setLoadingState('isGenerating', true);
 
     try {
+
+      const cleanedPosts = selectedPosts.map((post) => ({
+        ...post,
+        caption: typeof post.caption === "string" && post.caption.trim().length > 0
+          ? post.caption
+          : "Sem legenda", // substituição segura
+      }));
+
+
       // Prepara os dados de forma limpa
       const payload = {
         referenceUsername,
@@ -163,13 +172,16 @@ export default function DashboardPage() {
           followers: referenceProfile?.followers,
           profile_url: referenceProfile?.profile_url || referenceProfile?.url,
         },
-        selectedPosts: selectedPosts.map((post) => ({
+        selectedPosts: cleanedPosts.map((post) => ({
           caption: post.caption,
           likes: post.likes,
           comments: post.comments,
           datetime: post.datetime,
           url: post.url,
+          image_url: typeof post.image_url === "string" ? post.image_url : undefined,
+          video_url: typeof post.video_url === "string" ? post.video_url : undefined,
         })),
+
         goal,
         niche,
         audience,
@@ -324,28 +336,28 @@ export default function DashboardPage() {
             </div>
           )}
 
-{generatedContent && (
-  <div className="mt-8 space-y-4">
-    <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
-    {generatedContent.map((item, index) => (
-      <div key={index} className="p-4 border rounded-md bg-white dark:bg-neutral-900 shadow-sm">
-        <p className="whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
-          {item.caption}
-        </p>
-        {item.referencePostUrl && (
-          <a
-            href={item.referencePostUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 text-sm underline mt-2 inline-block"
-          >
-            Ver post original
-          </a>
-        )}
-      </div>
-    ))}
-  </div>
-)}
+          {generatedContent && (
+            <div className="mt-8 space-y-4">
+              <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
+              {generatedContent.map((item, index) => (
+                <div key={index} className="p-4 border rounded-md bg-white dark:bg-neutral-900 shadow-sm">
+                  <p className="whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
+                    {item.caption}
+                  </p>
+                  {item.referencePostUrl && (
+                    <a
+                      href={item.referencePostUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 dark:text-blue-400 text-sm underline mt-2 inline-block"
+                    >
+                      Ver post original
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
 
 

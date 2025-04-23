@@ -62,6 +62,8 @@ export async function POST(req: Request) {
       })
       .join("\n");
 
+      const hasManyEmptyCaptions = selectedPosts.filter(p => p.caption === "Sem legenda").length > 1;
+
     const prompt = `
 <expert_prompt>
 VOCÊ É UM AGENTE CRIATIVO DE ALTO NÍVEL, ESPECIALIZADO EM CONTEÚDO PARA INSTAGRAM, DOMINANDO O NICHO DE **${niche.toUpperCase()}**.
@@ -88,6 +90,8 @@ ${postsResumo}
 🧠 Público-alvo: ${audience}
 🎙️ Tom desejado: ${tone}
 📲 Formato solicitado: ${format.toUpperCase()}
+${hasManyEmptyCaptions ? "Observação: vários posts estão sem legenda. Interprete o estilo e objetivo com base na mídia e perfil." : ""}
+
 
 ## SAÍDA ESPERADA:
 - SE **Reels**: Roteiro dividido por blocos de tempo (ex: 0–5s, 5–10s...), incluindo:
