@@ -26,7 +26,7 @@ export function VerticalStepIndicator({ steps, currentIndex }: Props) {
               className={cn(
                 "flex items-center justify-center h-6 w-6 rounded-full border-2 shrink-0",
                 isActive
-                  ? "bg-primary text-white border-primary"
+                  ? "bg-primary text-white border-primary sticky top-20 z-10"
                   : isCompleted
                   ? "bg-muted border-muted"
                   : "bg-background border-border text-muted-foreground"

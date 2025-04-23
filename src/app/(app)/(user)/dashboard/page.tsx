@@ -149,7 +149,7 @@ export default function DashboardPage() {
       ref.scrollIntoView({ behavior: "smooth", block: blockPosition });
     }
   }, [stepIndex]);
-  
+
 
 
   //CHAMA A API PARA GERAR O CONTEÚDO
@@ -157,7 +157,7 @@ export default function DashboardPage() {
 
   const handleGenerateContent = async () => {
     setLoadingState("isGenerating", true);
-  
+
     const cleanedPosts = selectedPosts.map((post) => ({
       ...post,
       caption:
@@ -165,7 +165,7 @@ export default function DashboardPage() {
           ? post.caption
           : "Sem legenda",
     }));
-  
+
     const payload = {
       referenceUsername,
       referenceProfile: {
@@ -189,14 +189,14 @@ export default function DashboardPage() {
       tone,
       format,
     };
-  
+
     const maxAttempts = 2;
     let attempt = 0;
     let success = false;
-  
+
     while (attempt < maxAttempts && !success) {
       attempt++;
-  
+
       try {
         const res = await fetch("/api/generate-content", {
           method: "POST",
@@ -205,21 +205,21 @@ export default function DashboardPage() {
           },
           body: JSON.stringify(payload),
         });
-  
+
         const contentType = res.headers.get("content-type") || "";
         let result: any;
-  
+
         if (contentType.includes("application/json")) {
           result = await res.json();
         } else {
           const text = await res.text();
           throw new Error(`Resposta inesperada da API (texto): ${text}`);
         }
-  
+
         if (!res.ok) {
           throw new Error(result?.error || "Erro ao gerar conteúdo");
         }
-  
+
         setGeneratedContent(result.content);
         setTimeout(() => {
           generatedRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -228,7 +228,7 @@ export default function DashboardPage() {
         success = true;
       } catch (err: any) {
         console.error(`❌ Erro ao gerar conteúdo (tentativa ${attempt}):`, err);
-  
+
         if (attempt >= maxAttempts) {
           alert(
             "Erro ao gerar conteúdo. O servidor pode estar sobrecarregado ou indisponível. Tente novamente em instantes."
@@ -244,15 +244,24 @@ export default function DashboardPage() {
       }
     }
   };
-  
+
 
 
 
   return (
     <AppPageShell title={dashboardPageConfig.title} description={dashboardPageConfig.description}>
-      <div className="flex flex-col md:flex-row gap-8 mt-6">
-        <VerticalStepIndicator steps={steps} currentIndex={stepIndex} />
 
+      <div className="grid md:grid-cols-[220px_1fr] gap-8 mt-6">
+
+
+        {/* Barra lateral com sticky */}
+        <div className="relative">
+          <div className="sticky top-20">
+            <VerticalStepIndicator steps={steps} currentIndex={stepIndex} />
+          </div>
+        </div>
+
+        {/* Conteúdo principal */}
         <div className="flex-1 space-y-6">
 
           <div ref={stepRefs[0]}>
