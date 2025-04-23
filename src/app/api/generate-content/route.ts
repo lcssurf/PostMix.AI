@@ -98,7 +98,7 @@ ${postsResumo}
 ${hasManyEmptyCaptions ? "Observação: vários posts estão sem legenda. Interprete o estilo e objetivo com base na mídia e perfil." : ""}
 
 ## SAÍDA ESPERADA:
-- SE **Reels**: Roteiro dividido por blocos de tempo (ex: 0–5s, 5–10s...), incluindo:
+- SE **Reels**: Roteiro dividido por blocos de tempo (ex: 0–5s, 5–10s...), de no mínimo 1 minuto, incluindo:
   • Fala ou narração
   • Texto na tela
   • Sugestões visuais
@@ -135,16 +135,16 @@ ${hasManyEmptyCaptions ? "Observação: vários posts estão sem legenda. Interp
       console.log(new Date().toISOString(), "📝 Resposta da IA:", caption);
       
 
-      // return NextResponse.json({
-      //   content: [
-      //     {
-      //       caption,
-      //       referencePostUrls: selectedPosts.map((p) => p.url),
-      //     },
-      //   ],
-      // });
+      return NextResponse.json({
+        content: [
+          {
+            caption,
+            referencePostUrls: selectedPosts.map((p) => p.url),
+          },
+        ],
+      });
       // Para debug, retorna o raw da resposta da IA
-      return NextResponse.json({ raw: completion });
+      // return NextResponse.json({ raw: completion });
 
     } catch (fallbackError) {
       console.warn("⚠️ Falha com modelo Qwen. Tentando fallback com GPT-4o...");
