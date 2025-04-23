@@ -151,61 +151,92 @@ export default function DashboardPage() {
   const [generatedContent, setGeneratedContent] = useState<any[] | null>(null);
 
   const handleGenerateContent = async () => {
-    setLoadingState('isGenerating', true);
-
-    try {
-
-      const cleanedPosts = selectedPosts.map((post) => ({
-        ...post,
-        caption: typeof post.caption === "string" && post.caption.trim().length > 0
+    setLoadingState("isGenerating", true);
+  
+    const cleanedPosts = selectedPosts.map((post) => ({
+      ...post,
+      caption:
+        typeof post.caption === "string" && post.caption.trim().length > 0
           ? post.caption
-          : "Sem legenda", // substituição segura
-      }));
-
-
-      // Prepara os dados de forma limpa
-      const payload = {
-        referenceUsername,
-        referenceProfile: {
-          full_name: referenceProfile?.full_name,
-          biography: referenceProfile?.biography,
-          followers: referenceProfile?.followers,
-          profile_url: referenceProfile?.profile_url || referenceProfile?.url,
-        },
-        selectedPosts: cleanedPosts.map((post) => ({
-          caption: post.caption,
-          likes: post.likes,
-          comments: post.comments,
-          datetime: post.datetime,
-          url: post.url,
-          image_url: typeof post.image_url === "string" ? post.image_url : undefined,
-          video_url: typeof post.video_url === "string" ? post.video_url : undefined,
-        })),
-
-        goal,
-        niche,
-        audience,
-        tone,
-        format,
-      };
-
-      const res = await fetch("/api/generate-content", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await res.json();
-      setGeneratedContent(result.content);
-      console.log("✅ Conteúdo gerado:", result);
-    } catch (err) {
-      console.error("❌ Erro ao gerar conteúdo:", err);
-    } finally {
-      setLoadingState('isGenerating', false);
+          : "Sem legenda",
+    }));
+  
+    const payload = {
+      referenceUsername,
+      referenceProfile: {
+        full_name: referenceProfile?.full_name,
+        biography: referenceProfile?.biography,
+        followers: referenceProfile?.followers,
+        profile_url: referenceProfile?.profile_url || referenceProfile?.url,
+      },
+      selectedPosts: cleanedPosts.map((post) => ({
+        caption: post.caption,
+        likes: post.likes,
+        comments: post.comments,
+        datetime: post.datetime,
+        url: post.url,
+        image_url: typeof post.image_url === "string" ? post.image_url : undefined,
+        video_url: typeof post.video_url === "string" ? post.video_url : undefined,
+      })),
+      goal,
+      niche,
+      audience,
+      tone,
+      format,
+    };
+  
+    const maxAttempts = 2;
+    let attempt = 0;
+    let success = false;
+  
+    while (attempt < maxAttempts && !success) {
+      attempt++;
+  
+      try {
+        const res = await fetch("/api/generate-content", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        const contentType = res.headers.get("content-type") || "";
+        let result: any;
+  
+        if (contentType.includes("application/json")) {
+          result = await res.json();
+        } else {
+          const text = await res.text();
+          throw new Error(`Resposta inesperada da API (texto): ${text}`);
+        }
+  
+        if (!res.ok) {
+          throw new Error(result?.error || "Erro ao gerar conteúdo");
+        }
+  
+        setGeneratedContent(result.content);
+        console.log("✅ Conteúdo gerado:", result);
+        success = true;
+      } catch (err: any) {
+        console.error(`❌ Erro ao gerar conteúdo (tentativa ${attempt}):`, err);
+  
+        if (attempt >= maxAttempts) {
+          alert(
+            "Erro ao gerar conteúdo. O servidor pode estar sobrecarregado ou indisponível. Tente novamente em instantes."
+          );
+        } else {
+          // Aguarda antes de tentar novamente (ex: 1s, 2s...)
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+        }
+      } finally {
+        if (success || attempt >= maxAttempts) {
+          setLoadingState("isGenerating", false);
+        }
+      }
     }
   };
+  
 
 
 

@@ -1,3 +1,6 @@
+export const runtime = "nodejs"; // evitar timeout do edge (se for Next.js app route)
+export const config = { maxDuration: 60 }; // permite até 60s no plano Pro
+
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -6,7 +9,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY!,
   baseURL: "https://openrouter.ai/api/v1",
   defaultHeaders: {
-    "HTTP-Referer": "https://postmix.ai",
+    "HTTP-Referer": "https://postmix.zanapp.com.br",
     "X-Title": "PostMix.AI",
   },
 });
@@ -38,6 +41,8 @@ const RequestSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  console.log("📝 Iniciando geração de conteúdo... ", new Date().toISOString());
+  
   try {
     const body = await req.json();
     const {
@@ -116,7 +121,7 @@ ${hasManyEmptyCaptions ? "Observação: vários posts estão sem legenda. Interp
     // 👇 Tentativa com Qwen
     try {
       const completion = await openai.chat.completions.create({
-        model: "qwen/qwen2.5-vl-72b-instruct:free",
+        model: "meta-llama/llama-3.1-8b-instruct:free",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
         max_tokens: 1200,
@@ -124,21 +129,28 @@ ${hasManyEmptyCaptions ? "Observação: vários posts estão sem legenda. Interp
 
       const caption = completion.choices[0]?.message?.content?.trim();
 
+
       if (!caption) throw new Error("Resposta da IA veio vazia.");
 
-      return NextResponse.json({
-        content: [
-          {
-            caption,
-            referencePostUrls: selectedPosts.map((p) => p.url),
-          },
-        ],
-      });
+      console.log(new Date().toISOString(), "📝 Resposta da IA:", caption);
+      
+
+      // return NextResponse.json({
+      //   content: [
+      //     {
+      //       caption,
+      //       referencePostUrls: selectedPosts.map((p) => p.url),
+      //     },
+      //   ],
+      // });
+      // Para debug, retorna o raw da resposta da IA
+      return NextResponse.json({ raw: completion });
+
     } catch (fallbackError) {
       console.warn("⚠️ Falha com modelo Qwen. Tentando fallback com GPT-4o...");
 
       const gptFallback = await openai.chat.completions.create({
-        model: "openai/gpt-4o",
+        model: "qwen/qwen2.5-vl-72b-instruct:free",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
         max_tokens: 1200,
