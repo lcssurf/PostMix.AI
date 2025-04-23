@@ -27,7 +27,7 @@ export function StepFormat({ value, onSelect, disabled, completed, loading }: St
       className={cn(
         "space-y-4",
         disabled &&
-          "pointer-events-none select-none blur-sm grayscale overflow-hidden"
+        "pointer-events-none select-none blur-sm grayscale overflow-hidden"
       )}
     >
       <h2 className="text-lg font-semibold">📄 Qual formato você quer gerar?</h2>
@@ -49,13 +49,21 @@ export function StepFormat({ value, onSelect, disabled, completed, loading }: St
       </div>
       {tempFormat && (
         <Button
-          onClick={() => onSelect(tempFormat)}
+          onClick={() => {
+            onSelect(tempFormat); // mantém lógica de salvar o format e avançar
+            setTimeout(() => {
+              // callback para chamar handleGenerateContent logo após continuar
+              const el = document.getElementById("generate-button");
+              el?.click();
+            }, 100); // delay leve para garantir render
+          }}
           disabled={disabled || loading || completed}
           className="mt-4"
         >
-          {loading ? "Carregando..." : completed ? "Concluído" : "Continuar"}
+          {loading ? "Carregando..." : completed ? "Gerando Conteúdo..." : "Finalizar e Gerar"}
         </Button>
       )}
+
     </div>
   );
 }

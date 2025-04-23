@@ -12,6 +12,7 @@ import { StepNiche } from "@/components/Stepper/StepNiche";
 import { StepAudience } from "@/components/Stepper/StepAudience";
 import { StepTone } from "@/components/Stepper/StepTone";
 import { StepFormat } from "@/components/Stepper/StepFormat";
+import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
 
@@ -138,13 +139,17 @@ export default function DashboardPage() {
 
   //Scroll para o passo atual
   const stepRefs = steps.map(() => useRef<HTMLDivElement | null>(null));
+  const generatedRef = useRef<HTMLDivElement | null>(null);
+
 
   useEffect(() => {
     const ref = stepRefs[stepIndex]?.current;
     if (ref) {
-      ref.scrollIntoView({ behavior: "smooth", block: "end" });
+      const blockPosition = stepIndex === 1 ? "end" : "center"; // index 1 = StepPostSelection
+      ref.scrollIntoView({ behavior: "smooth", block: blockPosition });
     }
   }, [stepIndex]);
+  
 
 
   //CHAMA A API PARA GERAR O CONTEÚDO
@@ -216,6 +221,9 @@ export default function DashboardPage() {
         }
   
         setGeneratedContent(result.content);
+        setTimeout(() => {
+          generatedRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
         console.log("✅ Conteúdo gerado:", result);
         success = true;
       } catch (err: any) {
@@ -350,9 +358,10 @@ export default function DashboardPage() {
               completed={completedStates.format}
             />
           </div>
+          <Button id="generate-button" onClick={handleGenerateContent} className="hidden" />
 
           {/* Se todos os passos estiverem completos, exibe o botão de gerar conteúdo */}
-          {Object.entries(completedStates).every(([key, value]) => key !== "isGenerating" && value) && (
+          {/* {Object.entries(completedStates).every(([key, value]) => key !== "isGenerating" && value) && (
             <div className="mt-10 p-6 rounded-xl border bg-muted" id="generate-section">
               <h2 className="text-xl font-semibold mb-2">Tudo pronto!</h2>
               <p className="mb-4">Clique no botão abaixo para gerar seus conteúdos personalizados com base nas escolhas feitas.</p>
@@ -365,10 +374,10 @@ export default function DashboardPage() {
                 {loadingStates.isGenerating ? "Gerando..." : "Gerar Conteúdos"}
               </button>
             </div>
-          )}
+          )} */}
 
           {generatedContent && (
-            <div className="mt-8 space-y-4">
+            <div ref={generatedRef} className="mt-8 space-y-4">
               <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
               {generatedContent.map((item, index) => (
                 <div key={index} className="p-4 border rounded-md bg-white dark:bg-neutral-900 shadow-sm">
