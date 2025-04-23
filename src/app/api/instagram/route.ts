@@ -1,4 +1,8 @@
 // app/api/instagram/route.ts
+export const routeSegmentConfig = {
+  runtime: "nodejs", // permite fetch e mais tempo para execução
+  maxDuration: 60,   // 60 segundos (seu plano Vercel Pro permite)
+};
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/server/auth";
 import { BrightDataService } from "@/server/brightdata";
