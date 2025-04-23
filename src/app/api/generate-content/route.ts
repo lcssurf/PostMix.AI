@@ -26,8 +26,8 @@ const RequestSchema = z.object({
       comments: z.number().optional(),
       datetime: z.string().optional(),
       url: z.string().optional(),
-      image_url: z.string().optional(),
-      video_url: z.string().optional(),
+      image_url: z.string().nullable().optional(),
+      video_url: z.string().nullable().optional(),
     })
   ),
   goal: z.string(),
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
       })
       .join("\n");
 
-      const hasManyEmptyCaptions = selectedPosts.filter(p => p.caption === "Sem legenda").length > 1;
+    const hasManyEmptyCaptions = selectedPosts.filter(p => p.caption === "Sem legenda").length > 1;
 
     const prompt = `
 <expert_prompt>
@@ -92,7 +92,6 @@ ${postsResumo}
 📲 Formato solicitado: ${format.toUpperCase()}
 ${hasManyEmptyCaptions ? "Observação: vários posts estão sem legenda. Interprete o estilo e objetivo com base na mídia e perfil." : ""}
 
-
 ## SAÍDA ESPERADA:
 - SE **Reels**: Roteiro dividido por blocos de tempo (ex: 0–5s, 5–10s...), incluindo:
   • Fala ou narração
@@ -111,27 +110,58 @@ ${hasManyEmptyCaptions ? "Observação: vários posts estão sem legenda. Interp
 
 ⚠️ NUNCA forneça explicações ou variações alternativas.
 ✅ ENTREGUE APENAS O CONTEÚDO FINAL, PRONTO PARA PUBLICAÇÃO.
-
 </expert_prompt>
     `.trim();
 
-    const completion = await openai.chat.completions.create({
-      model: "qwen/qwen2.5-vl-72b-instruct:free",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: 1200,
-    });
+    // 👇 Tentativa com Qwen
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "qwen/qwen2.5-vl-72b-instruct:free",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 1200,
+      });
 
-    return NextResponse.json({
-      content: [
-        {
-          caption: completion.choices[0]?.message?.content?.trim() || "Conteúdo não disponível",
-          referencePostUrls: selectedPosts.map((p) => p.url),
-        },
-      ],
-    });
+      const caption = completion.choices[0]?.message?.content?.trim();
+
+      if (!caption) throw new Error("Resposta da IA veio vazia.");
+
+      return NextResponse.json({
+        content: [
+          {
+            caption,
+            referencePostUrls: selectedPosts.map((p) => p.url),
+          },
+        ],
+      });
+    } catch (fallbackError) {
+      console.warn("⚠️ Falha com modelo Qwen. Tentando fallback com GPT-4o...");
+
+      const gptFallback = await openai.chat.completions.create({
+        model: "openai/gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 1200,
+      });
+
+      const caption = gptFallback.choices[0]?.message?.content?.trim();
+
+      if (!caption) throw new Error("Fallback GPT-4o também falhou.");
+
+      return NextResponse.json({
+        content: [
+          {
+            caption,
+            referencePostUrls: selectedPosts.map((p) => p.url),
+          },
+        ],
+      });
+    }
   } catch (err: any) {
     console.error("❌ Erro na geração:", err);
-    return NextResponse.json({ error: err.message || "Erro interno" }, { status: 500 });
+    return NextResponse.json(
+      { error: err.message || "Erro interno" },
+      { status: 500 }
+    );
   }
 }
