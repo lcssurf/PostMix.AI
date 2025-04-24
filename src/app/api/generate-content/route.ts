@@ -55,13 +55,39 @@ export async function POST(req: Request) {
       format,
     } = RequestSchema.parse(body);
 
+    console.log("📝 Dados recebidos:", {
+      "Nome de Usuário de Referência": referenceUsername,
+      "Perfil de Referência": referenceProfile,
+      "Posts Selecionados": selectedPosts,
+      "Objetivo": goal,
+      "Nicho": niche,
+      "Público-Alvo": audience,
+      "Tom": tone,
+      "Formato": format,
+    });
+
+    function getMediaType(url: string | undefined): string {
+      if (!url) return "unknown";
+      const extension = url.split('.').pop()?.toLowerCase();
+      if (!extension) return "unknown";
+
+      const imageExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+      const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm"];
+
+      if (imageExtensions.includes(extension)) return "image";
+      if (videoExtensions.includes(extension)) return "video";
+
+      return "unknown";
+    }
+
+    selectedPosts.forEach((post) => {
+      const mediaType = getMediaType(post.url);
+      console.log(`Post URL: ${post.url}, Media Type: ${mediaType}`);
+    });
+
     const postsResumo = selectedPosts
       .map((post, i) => {
-        const midia = post.video_url
-          ? `🎞️ Vídeo: ${post.video_url}`
-          : post.image_url
-          ? `🖼️ Imagem: ${post.image_url}`
-          : "Sem mídia";
+        const midia = `Mídia (Imagem ou Vídeo): ${post?.url}`
         return `# POST ${i + 1}\n- LEGENDA: "${post.caption.slice(0, 300)}"\n- ENG. ❤️ ${post.likes || 0} | 💬 ${post.comments || 0}\n- ${midia}\n`;
       })
       .join("\n");
@@ -81,7 +107,7 @@ SEU OBJETIVO É TRANSFORMAR INSIGHTS DE POSTS REAIS EM UM ÚNICO CONTEÚDO FINAL
 4. ESTRUTURE a resposta diretamente no formato solicitado, SEM explicações adicionais.
 
 ## PERFIL DE REFERÊNCIA:
-- Nome: ${referenceProfile.full_name || referenceUsername}
+- Nome: ${referenceUsername || "Não disponível"}
 - Bio: ${referenceProfile.biography || "Não disponível"}
 - Seguidores: ${referenceProfile.followers || "?"}
 - Perfil: ${referenceProfile.profile_url || "Não informado"}
@@ -119,12 +145,43 @@ ${hasManyEmptyCaptions ? "Observação: vários posts estão sem legenda. Interp
 
     // 👇 Tentativa com Qwen
     try {
-      const completion = await openai.chat.completions.create({
-        model: "meta-llama/llama-3.1-8b-instruct:free",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-        max_tokens: 1200,
-      });
+
+      const images = selectedPosts
+        .filter((post) => {
+          const mediaType = getMediaType(post.url);
+          return mediaType === "image";
+        })
+        .map((post) => post.url);
+
+        const contentToSend = images.length === 0 
+          ? prompt 
+          : [
+          {
+            type: 'text',
+            text: prompt,
+          },
+          ...images.map((url) => ({
+            type: 'image_url',
+            text: `${url}`,
+          })),
+            ];
+
+        const serializedContent = Array.isArray(contentToSend)
+          ? JSON.stringify(contentToSend)
+          : contentToSend;
+
+        const completion = await openai.chat.completions.create({
+          // model: "meta-llama/llama-3.1-8b-instruct:free",
+          model:"google/gemini-2.5-pro-exp-03-25:free",
+          messages: [
+            { 
+          role: "user", 
+          content: serializedContent 
+            }
+          ],
+          temperature: 2,
+          max_tokens: 50000,
+        });
 
       const caption = completion.choices[0]?.message?.content?.trim();
 
