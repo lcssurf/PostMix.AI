@@ -68,6 +68,13 @@ export default function DashboardPage() {
   const [format, setFormat] = useState("");
 
 
+  useEffect(() => {
+    console.log("📌 Reference Username:", referenceUsername);
+    console.log("📌 Reference Profile:", referenceProfile);
+    console.log("📌 Reference Posts:", referencePosts);
+  }, [referenceUsername, referenceProfile, referencePosts]);
+
+
   const fetchReferenceProfile = async (username: string) => {
     setLoadingState('isLoadingProfile', true);
 
@@ -98,12 +105,12 @@ export default function DashboardPage() {
         const now = Date.now();
         const cacheAge = now - (parsed._cachedAt || 0);
 
-        // Verifica se o cache ainda é válido (1 hora = 3600000ms, 30 minutos = 1800000ms)
-        if (cacheAge < 3600000) { // 10000ms = 10s
-          setReferenceProfile(parsed);
-          setReferencePosts(parsed.posts || []);
+        if (cacheAge < 100000) {
+          setReferenceProfile(parsed.profile);
+          setReferencePosts(parsed.posts);
           setReferenceUsername(sanitized);
           nextIfValid("profile", () => { });
+          console.log("🔄 Cache encontrado e válido para:", sanitized);
           return;
         } else {
           console.log("🔄 Cache expirado para:", sanitized);
@@ -115,19 +122,44 @@ export default function DashboardPage() {
 
     try {
       const res = await fetch(`/api/instagram?username=${sanitized}`);
-      const data = await res.json();
 
-      if (data?.warning_code === "dead_page") {
+      const posts = await res.json();
+
+      console.log("📸 Dados do Instagram:", posts);
+      // return
+
+
+      if (!Array.isArray(posts)) {
+        throw new Error("Erro ao buscar posts do perfil.");
+      }
+
+      if (posts.length === 0) {
+        throw new Error("Não foram encontrados posts nesse perfil.");
+      }
+
+      if (posts[0]?.warning_code === "dead_page") {
         throw new Error("O perfil informado não foi encontrado. Verifique se o nome de usuário está correto.");
       }
 
-      if (!res.ok) throw new Error(data?.error || "Erro inesperado");
+      const profile = {
+        username: posts[0]?.user_posted || sanitized,
+        followers: posts[0]?.followers || null,
+        profile_image_link: posts[0]?.profile_image_link || null,
+        profile_url: posts[0]?.profile_url || `https://www.instagram.com/${sanitized}/`,
+        is_verified: posts[0]?.is_verified || false,
+        posts_count: posts[0]?.posts_count || posts.length,
+      };
 
-      const payload = { ...data, _cachedAt: Date.now() };
+      const payload = {
+        profile,
+        posts,
+        _cachedAt: Date.now(),
+      };
+
       sessionStorage.setItem(cacheKey, JSON.stringify(payload));
 
-      setReferenceProfile(data);
-      setReferencePosts(data.posts || []);
+      setReferenceProfile(profile);
+      setReferencePosts(posts);
       setReferenceUsername(sanitized);
       nextIfValid("profile", () => { });
     } catch (err: any) {
@@ -136,6 +168,7 @@ export default function DashboardPage() {
       setLoadingState('isLoadingProfile', false);
     }
   };
+
 
   //Scroll para o passo atual
   const stepRefs = steps.map(() => useRef<HTMLDivElement | null>(null));
@@ -279,19 +312,21 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div ref={stepRefs[1]}>
-            <StepPostSelection
-              profile={referenceProfile}
-              completed={completedStates.posts}
-              loading={loadingStates.isLoadingPosts}
-              posts={referencePosts}
-              onNext={(posts) => {
+          {referenceProfile && referencePosts.length > 0 && (
+            <div ref={stepRefs[1]}>
+              <StepPostSelection
+                profile={referenceProfile}
+                completed={completedStates.posts}
+                loading={loadingStates.isLoadingPosts}
+                posts={referencePosts}
+                onNext={(posts) => {
 
-                nextIfValid("posts", () => setSelectedPosts(posts));
-              }}
-              disabled={!isStepEnabled(1)}
-            />
-          </div>
+                  nextIfValid("posts", () => setSelectedPosts(posts));
+                }}
+                disabled={!isStepEnabled(1)}
+              />
+            </div>
+          )}
 
           <div ref={stepRefs[2]}>
             <StepGoal

@@ -4,9 +4,9 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 
 export type Post = {
-  id: string;
-  caption?: string;
-  image_url: string;
+  post_id: string;
+  description?: string;
+  photos: string;
   url: string;
   video_url?: string | null;
   likes?: number;
@@ -32,7 +32,7 @@ export function PostCard({ post, selected, toggleSelect, disabled }: PostCardPro
     >
       <div className="relative aspect-[1/1] w-full h-auto">
         <Image
-          src={post.image_url}
+          src={post?.photos[0] as string}
           alt="Post"
           fill
           className="object-cover"
@@ -40,7 +40,7 @@ export function PostCard({ post, selected, toggleSelect, disabled }: PostCardPro
       </div>
       <div className="p-3 space-y-1 text-sm">
         <p className="font-medium line-clamp-2">
-          {post.caption || "Sem legenda"}
+          {post.description || "Sem legenda"}
         </p>
         {post.likes !== undefined && (
           <p className="text-xs text-muted-foreground">❤️ {post.likes} curtidas</p>

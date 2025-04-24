@@ -28,6 +28,9 @@ type Props = {
 };
 
 export function StepPostSelection({ posts, onNext, disabled, completed, loading, profile }: Props) {
+
+  console.log("StepPostSelection posts", posts);
+  
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggle = (id: string | number) => {
@@ -61,54 +64,54 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
             <div className="flex flex-col text-sm gap-0.5">
               <div>
                 <a
-                  href={profile.profile_url}
+                  href={profile?.profile_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold hover:underline"
                 >
-                  @{profile.account}
+                  @{profile?.account}
                 </a>
-                {profile.profile_name && (
-                  <span className="ml-2 text-muted-foreground">{profile.profile_name}</span>
+                {profile?.profile_name && (
+                  <span className="ml-2 text-muted-foreground">{profile?.profile_name}</span>
                 )}
               </div>
 
               {profile.followers !== undefined && (
                 <span className="text-xs text-muted-foreground">
-                  {profile.followers.toLocaleString()} seguidores
+                  {profile?.followers?.toLocaleString()} seguidores
                 </span>
               )}
 
-              {profile.posts_count !== undefined && (
+              {profile?.posts_count !== undefined && (
                 <span className="text-xs text-muted-foreground">
-                  {profile.posts_count} publicações
+                  {profile?.posts_count} publicações
                 </span>
               )}
 
-              {profile.following !== undefined && (
+              {profile?.following !== undefined && (
                 <span className="text-xs text-muted-foreground">
-                  Seguindo {profile.following.toLocaleString()}
+                  Seguindo {profile?.following.toLocaleString()}
                 </span>
               )}
 
-              {profile.category_name && (
-                <span className="text-xs text-muted-foreground">{profile.category_name}</span>
+              {profile?.category_name && (
+                <span className="text-xs text-muted-foreground">{profile?.category_name}</span>
               )}
 
-              {profile.biography && (
+              {profile?.biography && (
                 <p className="text-xs text-muted-foreground mt-1 leading-snug">
-                  {profile.biography}
+                  {profile?.biography}
                 </p>
               )}
 
-              {(profile.external_url ?? []).length > 0 && (
+              {(profile?.external_url ?? []).length > 0 && (
                 <a
-                  href={profile.external_url?.[0]}
+                  href={profile?.external_url?.[0]}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-blue-500 hover:underline break-all mt-1"
                 >
-                  🔗 {profile.external_url?.[0]}
+                  🔗 {profile?.external_url?.[0]}
                 </a>
               )}
             </div>
@@ -118,12 +121,12 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
       </CardHeader>
 
       <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {posts.map((post) => (
+        {posts?.map((post) => (
           <PostCard
-            key={post.id}
+            key={post.post_id}
             post={post}
-            selected={selected.includes(String(post.id))}
-            toggleSelect={() => toggle(post.id)}
+            selected={selected.includes(String(post.post_id))}
+            toggleSelect={() => toggle(post.post_id)}
             disabled={disabled}
           />
         ))}
@@ -131,7 +134,7 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
           <div className="col-span-full">
             <Button
               onClick={() =>
-                onNext(posts.filter((p) => selected.includes(String(p.id))))
+                onNext(posts.filter((p) => selected.includes(String(p.post_id))))
               }
               disabled={selected.length === 0 || loading || completed}
             >

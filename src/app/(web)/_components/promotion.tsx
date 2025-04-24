@@ -7,18 +7,15 @@ export function Promotion() {
                 as="h2"
                 className="text-center font-heading text-3xl font-bold md:text-5xl"
             >
-                Launch your SaaS in just a few days 🚀
+                Cresça no Instagram com estratégia e inteligência 📈
             </Balancer>
             <Balancer
                 as="p"
                 className="text-center text-base leading-relaxed text-background/70 sm:text-xl"
             >
-                Because Rapidlaunch comes with a SaaS starter kit, Blocks and
-                guides, and more, you can launch your SaaS in just a few days.
-                Get started with our starter kits, components, building guides,
-                and more. Customizable.{" "}
+                O PostMix.ai transforma perfis de referência em conteúdo pronto para o seu Instagram. Mais alcance, mais engajamento, sem precisar quebrar a cabeça com o que postar. Comece a criar com base no que já funciona — com um toque só seu.
                 <span className="rounded-[5px] bg-background p-1 font-semibold text-foreground">
-                    Open Source.
+                    Gratuito para começar.
                 </span>
             </Balancer>
         </section>

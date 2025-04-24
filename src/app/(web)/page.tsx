@@ -14,7 +14,7 @@ import Balancer from "react-wrap-balancer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Build Your MVP in Days, not weeks. Next.js Starter Kit",
+    title: "PostMix.ai – Cresça no Instagram com inteligência",
 };
 
 export const dynamic = "force-static";
@@ -23,19 +23,17 @@ export default async function HomePage() {
     return (
         <WebPageWrapper>
             <WebPageHeader
-                badge="Launch your saas in 24 hours"
-                title="Build Your MVP in Days, not weeks. Open Source Starter Kit"
+                badge="Conteúdo que gera resultado"
+                title="Cresça no Instagram com inteligência – sem precisar adivinhar o que postar"
             >
                 <Balancer
                     as="p"
                     className="text-center text-base text-muted-foreground sm:text-lg"
                 >
-                    Elevate your development game with Rapidlaunch! Launch your
-                    apps faster with our SaaS starterkits, components, building
-                    guides, and more. Customizable. Open Source.
+                    O PostMix.ai analisa o que está funcionando nos perfis que te inspiram e gera conteúdos prontos, otimizados para engajar. Você só escolhe o perfil de referência. A IA faz o resto.
                 </Balancer>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap justify-center items-center gap-3">
                     <Link
                         href={siteUrls.github}
                         className={buttonVariants({ variant: "outline" })}
@@ -49,9 +47,9 @@ export default async function HomePage() {
                         href={siteUrls.auth.signup}
                         className={buttonVariants()}
                     >
-                        Signup
+                        Começar agora
                         <span className="ml-1 font-light italic">
-                            — it&apos;s free
+                            — é grátis
                         </span>
                     </Link>
                 </div>
@@ -61,7 +59,7 @@ export default async function HomePage() {
                 <div className="relative aspect-video w-full rounded-md bg-muted">
                     <Image
                         src="https://utfs.io/f/43bbc3c8-cf3c-4fae-a0eb-9183f1779489-294m81.png"
-                        alt="dashboard preview"
+                        alt="preview da plataforma PostMix"
                         fill
                         className="block rounded-md border border-border dark:hidden"
                         priority
@@ -69,7 +67,7 @@ export default async function HomePage() {
 
                     <Image
                         src="https://utfs.io/f/fddea366-51c6-45f4-bd54-84d273ad9fb9-1ly324.png"
-                        alt="dashboard preview"
+                        alt="preview da plataforma PostMix"
                         fill
                         className="hidden rounded-md border border-border dark:block"
                         priority
