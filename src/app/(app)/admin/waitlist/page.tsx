@@ -9,6 +9,7 @@ import type { SearchParams } from "@/types/data-table";
 import { z } from "zod";
 import json2csv from "json2csv";
 import { DownloadCsvBtn } from "@/app/(app)/admin/waitlist/_components/download-csv-btn";
+import { Button } from "@/components/ui/button";
 
 type WaitlistProps = {
     searchParams: SearchParams;
@@ -29,7 +30,9 @@ export default async function Waitlist({ searchParams }: WaitlistProps) {
 
     const waitlistData = await getAllWaitlistUsersQuery();
 
-    const csvData = await json2csv.parseAsync(waitlistData);
+    const csvData = waitlistData && waitlistData.length > 0 
+        ? await json2csv.parseAsync(waitlistData) 
+        : null;
 
     return (
         <AppPageShell
@@ -38,7 +41,14 @@ export default async function Waitlist({ searchParams }: WaitlistProps) {
         >
             <div className="w-full space-y-6">
                 <div className="flex items-center justify-end">
-                    <DownloadCsvBtn data={csvData} />
+                    {csvData && csvData.length > 0 ? (
+                        <DownloadCsvBtn data={csvData} />
+                    ) : (
+                        <Button variant="secondary" disabled>
+                            Download CSV
+                        </Button>
+                    )}
+
                 </div>
 
                 <WaitlistTable waitlistPromise={waitlistPromise} />

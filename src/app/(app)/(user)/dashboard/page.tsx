@@ -105,12 +105,13 @@ export default function DashboardPage() {
         const now = Date.now();
         const cacheAge = now - (parsed._cachedAt || 0);
 
-        if (cacheAge < 100000) {
+        if (cacheAge < 120 * 60 * 1000) { // Cache válido por 2h (120 minutos)
           setReferenceProfile(parsed.profile);
           setReferencePosts(parsed.posts);
           setReferenceUsername(sanitized);
           nextIfValid("profile", () => { });
           console.log("🔄 Cache encontrado e válido para:", sanitized);
+          setLoadingState('isLoadingProfile', false);
           return;
         } else {
           console.log("🔄 Cache expirado para:", sanitized);
@@ -178,7 +179,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const ref = stepRefs[stepIndex]?.current;
     if (ref) {
-      const blockPosition = stepIndex === 1 ? "end" : "center"; // index 1 = StepPostSelection
+      const blockPosition = stepIndex === 1 ? "start" : "center"; // index 1 = StepPostSelection
       ref.scrollIntoView({ behavior: "smooth", block: blockPosition });
     }
   }, [stepIndex]);

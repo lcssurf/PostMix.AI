@@ -126,32 +126,32 @@ const navigation: SidebarNavItems[] = [
     },
     {
         id: navIds.org,
-        label: "Organization",
+        label: "Organização",
         showLabel: true,
         items: [
             {
-                label: "Members",
+                label: "Membros",
                 icon: UsersRoundIcon,
                 subMenu: [
                     {
-                        label: "Org Members",
+                        label: "Membros da Organização",
                         icon: UserRoundCheckIcon,
                         href: siteUrls.organization.members.home,
                     },
                     {
-                        label: "Invite Members",
+                        label: "Convidar Membros",
                         icon: UserRoundPlusIcon,
                         href: siteUrls.organization.members.invite,
                     },
                 ],
             },
             {
-                label: "Plans & Billing",
+                label: "Minha Assinatura",
                 icon: CreditCardIcon,
                 href: siteUrls.organization.plansAndBilling,
             },
             {
-                label: "Settings",
+                label: "Configurações",
                 icon: Settings2Icon,
                 href: siteUrls.organization.settings,
             },
@@ -159,26 +159,26 @@ const navigation: SidebarNavItems[] = [
     },
     {
         id: navIds.resources,
-        label: "Resources",
+        label: "Ajuda",
         showLabel: true,
         items: [
             {
-                label: "Feedbacks",
+                label: "Deixe seu Feedback",
                 icon: MessageSquareIcon,
                 href: siteUrls.feedback,
             },
+            // {
+            //     label: "Docs",
+            //     icon: BookTextIcon,
+            //     href: siteUrls.docs,
+            // },
+            // {
+            //     label: "Blog",
+            //     icon: PenLineIcon,
+            //     href: siteUrls.blogs,
+            // },
             {
-                label: "Docs",
-                icon: BookTextIcon,
-                href: siteUrls.docs,
-            },
-            {
-                label: "Blog",
-                icon: PenLineIcon,
-                href: siteUrls.blogs,
-            },
-            {
-                label: "Support",
+                label: "Suporte",
                 icon: HelpCircleIcon,
                 href: siteUrls.support,
             },

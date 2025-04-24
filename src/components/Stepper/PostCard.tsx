@@ -30,11 +30,12 @@ export function PostCard({ post, selected, toggleSelect, disabled }: PostCardPro
         disabled ? "opacity-50 pointer-events-none select-none" : "cursor-pointer"
       )}
     >
-      <div className="relative aspect-[1/1] w-full h-auto">
+      <div className="relative w-full aspect-square">
         <Image
           src={post?.photos[0] as string}
           alt="Post"
           fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover"
         />
       </div>

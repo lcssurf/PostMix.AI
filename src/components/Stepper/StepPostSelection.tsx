@@ -13,7 +13,7 @@ type Props = {
   profile?: {
     profile_image_link: string;
     profile_url: string;
-    profile_name: string | null;
+    username: string | null;
     account: string;
     biography?: string;
     followers?: number;
@@ -52,13 +52,13 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
       )}
     >
       <CardHeader>
-        <CardTitle>📸 Selecione até 3 posts para análise</CardTitle>
+        <CardTitle className="mb-4">📷 Selecione até 3 posts alinhados com o conteúdo que você deseja criar e clique em Analisar.</CardTitle>
 
         {profile && (
           <div className="flex items-start gap-4 p-4 border rounded-xl bg-muted/30 mt-4">
             <img
               src={proxiedImage}
-              alt={profile.profile_name || profile.account}
+              alt={profile.username || profile.account}
               className="w-14 h-14 rounded-full object-cover border"
             />
             <div className="flex flex-col text-sm gap-0.5">
@@ -69,11 +69,12 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
                   rel="noopener noreferrer"
                   className="font-semibold hover:underline"
                 >
-                  @{profile?.account}
+                  {/* {JSON.stringify(profile)} */}
+                  @{profile?.username}
                 </a>
-                {profile?.profile_name && (
-                  <span className="ml-2 text-muted-foreground">{profile?.profile_name}</span>
-                )}
+                {/* {profile?.username && (
+                  <span className="ml-2 text-muted-foreground">{profile?.username}</span>
+                )} */}
               </div>
 
               {profile.followers !== undefined && (
@@ -120,7 +121,7 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
 
       </CardHeader>
 
-      <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {posts?.map((post) => (
           <PostCard
             key={post.post_id}

@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 const schema = z.object({
   competitor: z.string().min(2),
@@ -47,7 +48,22 @@ export function StepProfileInput({ onSubmit, disabled, loading, error, completed
         />
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        <Button onClick={handleSubmit(onSubmit)} disabled={disabled || loading || completed}>{loading ? "Carregando..." : completed ? "Concluído" : "Buscar posts"}</Button>
+        <Button onClick={handleSubmit(onSubmit)} disabled={disabled || loading || completed}>
+          {loading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Carregando...
+            </div>
+          ) : completed ? (
+            "Concluído"
+          ) : (
+            "Buscar posts"
+          )}
+        </Button>
+
+        <p className="text-sm text-muted-foreground">
+          ⏳ Este processo leva em média <strong>3 minutos</strong>, dependendo da quantidade de posts.
+        </p>
 
       </CardContent>
     </Card>
