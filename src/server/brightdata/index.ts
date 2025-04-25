@@ -16,6 +16,9 @@ const headers = {
 export const BrightDataService = {
 
   async triggerInstagramCollection(usernames: string[]) {
+
+    console.log("📸 Iniciando coleta de dados do Instagram... ", new Date().toISOString());
+    
     if (!DATASET_ID_INSTAGRAM) throw new Error("Missing DATASET_ID_INSTAGRAM");
   
     const payload = usernames.map((username) => ({
@@ -28,7 +31,9 @@ export const BrightDataService = {
   
     const url = `${BASE_URL}/trigger?dataset_id=${DATASET_ID_INSTAGRAM}&include_errors=true&type=discover_new&discover_by=url`;
     const response = await axios.post(url, payload, { headers });
-  
+    
+    console.log("📸 Coleta de dados do Instagram concluída: ", response.data);
+    
     return response.data;
   },
   
