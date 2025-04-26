@@ -124,66 +124,66 @@ const navigation: SidebarNavItems[] = [
             },
         ],
     },
-    {
-        id: navIds.org,
-        label: "Organização",
-        showLabel: true,
-        items: [
-            {
-                label: "Membros",
-                icon: UsersRoundIcon,
-                subMenu: [
-                    {
-                        label: "Membros da Organização",
-                        icon: UserRoundCheckIcon,
-                        href: siteUrls.organization.members.home,
-                    },
-                    {
-                        label: "Convidar Membros",
-                        icon: UserRoundPlusIcon,
-                        href: siteUrls.organization.members.invite,
-                    },
-                ],
-            },
-            {
-                label: "Minha Assinatura",
-                icon: CreditCardIcon,
-                href: siteUrls.organization.plansAndBilling,
-            },
-            {
-                label: "Configurações",
-                icon: Settings2Icon,
-                href: siteUrls.organization.settings,
-            },
-        ],
-    },
-    {
-        id: navIds.resources,
-        label: "Ajuda",
-        showLabel: true,
-        items: [
-            {
-                label: "Deixe seu Feedback",
-                icon: MessageSquareIcon,
-                href: siteUrls.feedback,
-            },
-            // {
-            //     label: "Docs",
-            //     icon: BookTextIcon,
-            //     href: siteUrls.docs,
-            // },
-            // {
-            //     label: "Blog",
-            //     icon: PenLineIcon,
-            //     href: siteUrls.blogs,
-            // },
-            {
-                label: "Suporte",
-                icon: HelpCircleIcon,
-                href: siteUrls.support,
-            },
-        ],
-    },
+    // {
+    //     id: navIds.org,
+    //     label: "Organização",
+    //     showLabel: true,
+    //     items: [
+    //         {
+    //             label: "Membros",
+    //             icon: UsersRoundIcon,
+    //             subMenu: [
+    //                 {
+    //                     label: "Membros da Organização",
+    //                     icon: UserRoundCheckIcon,
+    //                     href: siteUrls.organization.members.home,
+    //                 },
+    //                 {
+    //                     label: "Convidar Membros",
+    //                     icon: UserRoundPlusIcon,
+    //                     href: siteUrls.organization.members.invite,
+    //                 },
+    //             ],
+    //         },
+    //         {
+    //             label: "Minha Assinatura",
+    //             icon: CreditCardIcon,
+    //             href: siteUrls.organization.plansAndBilling,
+    //         },
+    //         {
+    //             label: "Configurações",
+    //             icon: Settings2Icon,
+    //             href: siteUrls.organization.settings,
+    //         },
+    //     ],
+    // },
+    // {
+    //     id: navIds.resources,
+    //     label: "Ajuda",
+    //     showLabel: true,
+    //     items: [
+    //         {
+    //             label: "Deixe seu Feedback",
+    //             icon: MessageSquareIcon,
+    //             href: siteUrls.feedback,
+    //         },
+    //         // {
+    //         //     label: "Docs",
+    //         //     icon: BookTextIcon,
+    //         //     href: siteUrls.docs,
+    //         // },
+    //         // {
+    //         //     label: "Blog",
+    //         //     icon: PenLineIcon,
+    //         //     href: siteUrls.blogs,
+    //         // },
+    //         {
+    //             label: "Suporte",
+    //             icon: HelpCircleIcon,
+    //             href: siteUrls.support,
+    //         },
+    //     ],
+    // },
 ];
 
 type FilterNavItemsProps = {

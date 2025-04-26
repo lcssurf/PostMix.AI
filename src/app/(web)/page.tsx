@@ -34,14 +34,14 @@ export default async function HomePage() {
                 </Balancer>
 
                 <div className="flex flex-wrap justify-center items-center gap-3">
-                    <Link
+                    {/* <Link
                         href={siteUrls.github}
                         className={buttonVariants({ variant: "outline" })}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
                         <Icons.gitHub className="mr-2 h-4 w-4" /> Github
-                    </Link>
+                    </Link> */}
 
                     <Link
                         href={siteUrls.auth.signup}
@@ -55,7 +55,7 @@ export default async function HomePage() {
                 </div>
             </WebPageHeader>
 
-            <div className="-m-2 w-full rounded-xl bg-foreground/5 p-2 ring-1 ring-inset ring-foreground/10 lg:-m-4 lg:rounded-2xl lg:p-4">
+            {/* <div className="-m-2 w-full rounded-xl bg-foreground/5 p-2 ring-1 ring-inset ring-foreground/10 lg:-m-4 lg:rounded-2xl lg:p-4">
                 <div className="relative aspect-video w-full rounded-md bg-muted">
                     <Image
                         src="https://utfs.io/f/43bbc3c8-cf3c-4fae-a0eb-9183f1779489-294m81.png"
@@ -73,7 +73,7 @@ export default async function HomePage() {
                         priority
                     />
                 </div>
-            </div>
+            </div> */}
 
             <Promotion />
 

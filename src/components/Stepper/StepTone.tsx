@@ -12,22 +12,31 @@ const TONES = [
 ];
 
 interface StepToneProps {
-  value?: string;
-  onSelect: (tone: string) => void;
+  value: string[];
+  onSelect: (tones: string[]) => void;
   disabled?: boolean;
   completed?: boolean;
   loading?: boolean;
 }
 
 export function StepTone({ value, onSelect, disabled, completed, loading }: StepToneProps) {
-  const [tempTone, setTempTone] = useState(value || "");
+  const [tempTone, setTempTone] = useState<string[]>(value || []);
+
+  const toggleTone = (toneValue: string) => {
+    setTempTone((prev) =>
+      prev.includes(toneValue)
+        ? prev.filter((t) => t !== toneValue)
+        : [...prev, toneValue]
+    );
+  };
+
 
   return (
     <div
       className={cn(
         "space-y-4",
         disabled &&
-          "pointer-events-none select-none blur-sm grayscale overflow-hidden"
+        "pointer-events-none select-none blur-sm grayscale overflow-hidden"
       )}
     >
       <h2 className="text-lg font-semibold">🗣️ Qual tom de voz você prefere?</h2>
@@ -37,9 +46,9 @@ export function StepTone({ value, onSelect, disabled, completed, loading }: Step
             key={tone.value}
             className={cn(
               "cursor-pointer transition-all",
-              tempTone === tone.value && "ring-2 ring-primary"
+              tempTone.includes(tone.value) && "ring-2 ring-primary"
             )}
-            onClick={() => !disabled && !completed && setTempTone(tone.value)}
+            onClick={() => !disabled && !completed && toggleTone(tone.value)}
           >
             <CardContent className="p-4 text-sm font-medium">
               {tone.label}
@@ -47,7 +56,7 @@ export function StepTone({ value, onSelect, disabled, completed, loading }: Step
           </Card>
         ))}
       </div>
-      {tempTone && (
+      {tempTone.length > 0 && (
         <Button
           onClick={() => onSelect(tempTone)}
           disabled={disabled || loading || completed}

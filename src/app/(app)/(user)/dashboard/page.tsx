@@ -15,6 +15,7 @@ import { StepFormat } from "@/components/Stepper/StepFormat";
 import { Button } from "@/components/ui/button";
 
 import * as Toast from "@radix-ui/react-toast";
+import { StepSpecificSubject } from "@/components/Stepper/StepSpecificSubject";
 
 
 export default function DashboardPage() {
@@ -28,6 +29,7 @@ export default function DashboardPage() {
     isLoadingTone: false,
     isLoadingFormat: false,
     isGenerating: false,
+    isLoadingSpecificSubject: false,
   });
 
   const setLoadingState = (key: keyof typeof loadingStates, value: boolean) => {
@@ -42,6 +44,7 @@ export default function DashboardPage() {
     audience: false,
     tone: false,
     format: false,
+    specificSubject: false,
   });
   const setCompletedState = (key: keyof typeof completedStates, value: boolean) => {
     setCompletedStates((prev) => ({ ...prev, [key]: value }));
@@ -67,8 +70,11 @@ export default function DashboardPage() {
   const [goal, setGoal] = useState("");
   const [niche, setNiche] = useState("");
   const [audience, setAudience] = useState("");
-  const [tone, setTone] = useState("");
+  const [tone, setTone] = useState<string[]>([]);
   const [format, setFormat] = useState("");
+  const [specificSubject, setSpecificSubject] = useState("");
+
+
 
   const [transcriptions, setTranscriptions] = useState<Record<string, string[]>>({});
   const [isTranscribing, setIsTranscribing] = useState(false);
@@ -109,9 +115,10 @@ export default function DashboardPage() {
     setGoal("");
     setNiche("");
     setAudience("");
-    setTone("");
+    setTone([""]);
     setFormat("");
     setProfileError("");
+    setSpecificSubject("");
 
     const sanitized = username.replace(/^@/, "").trim();
     if (!/^[a-zA-Z0-9._]{2,30}$/.test(sanitized)) {
@@ -249,6 +256,7 @@ export default function DashboardPage() {
       audience,
       tone,
       format,
+      specificSubject,
     });
 
 
@@ -551,18 +559,29 @@ export default function DashboardPage() {
           </div>
 
           <div ref={stepRefs[5]}>
+            <StepSpecificSubject
+              defaultValue={specificSubject}
+              onNext={(subject) => nextIfValid("specificSubject", () => setSpecificSubject(subject))}
+              disabled={!isStepEnabled(5)}
+              loading={loadingStates.isLoadingSpecificSubject}
+              completed={completedStates.specificSubject}
+            />
+          </div>
+
+
+          <div ref={stepRefs[6]}>
             <StepTone
               value={tone}
               onSelect={(t) => {
                 nextIfValid("tone", () => setTone(t));
               }}
-              disabled={!isStepEnabled(5)}
+              disabled={!isStepEnabled(6)}
               loading={loadingStates.isLoadingTone}
               completed={completedStates.tone}
             />
           </div>
 
-          <div ref={stepRefs[6]}>
+          <div ref={stepRefs[7]}>
             <StepFormat
               value={format}
               onSelect={(f) => {
@@ -584,7 +603,7 @@ export default function DashboardPage() {
                 });
               }}
 
-              disabled={!isStepEnabled(6)}
+              disabled={!isStepEnabled(7)}
               loading={loadingStates.isLoadingFormat || isTranscribing}
               completed={completedStates.format}
             />
@@ -750,7 +769,7 @@ export default function DashboardPage() {
             className="bg-blue-100 border border-blue-300 dark:bg-blue-900 dark:border-blue-700 shadow-lg rounded-lg p-4 w-80 z-[999]"
           >
             <Toast.Title className="font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-2">
-                <span className="animate-[spin_2s_linear_infinite]">⏳</span>Gerando conteúdo...
+              <span className="animate-[spin_2s_linear_infinite]">⏳</span>Gerando conteúdo...
             </Toast.Title>
             <Toast.Description className="text-sm text-blue-600 dark:text-blue-400 mt-1">
               Estamos criando seu post personalizado. Isso pode levar alguns minutos 🚀
