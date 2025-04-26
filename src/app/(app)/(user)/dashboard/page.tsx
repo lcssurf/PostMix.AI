@@ -70,11 +70,21 @@ export default function DashboardPage() {
   const [tone, setTone] = useState("");
   const [format, setFormat] = useState("");
 
-  const [transcriptions, setTranscriptions] = useState<Record<string, string>>({});
+  const [transcriptions, setTranscriptions] = useState<Record<string, string[]>>({});
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [progressInfo, setProgressInfo] = useState({ completed: 0, total: 0 });
   const [failedPosts, setFailedPosts] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
+
+  const [showGenerationSuccess, setShowGenerationSuccess] = useState(false);
+
+
+  const estimatedSeconds = Math.ceil((progressInfo.total - progressInfo.completed) * 2);
+  const estimatedMinutes = Math.floor(estimatedSeconds / 60);
+  const estimatedRemaining = estimatedMinutes > 0
+    ? `${estimatedMinutes} min`
+    : `${estimatedSeconds} seg`;
+
 
 
 
@@ -212,15 +222,15 @@ export default function DashboardPage() {
           : "Sem legenda",
     }));
 
-    const payload = {
+    const payload = removeEmptyFields({
       referenceUsername,
-      referenceProfile: {
+      referenceProfile: removeEmptyFields({
         full_name: referenceProfile?.full_name,
         biography: referenceProfile?.biography,
         followers: referenceProfile?.followers,
         profile_url: referenceProfile?.profile_url || referenceProfile?.url,
-      },
-      selectedPosts: cleanedPosts.map((post) => ({
+      }),
+      selectedPosts: cleanedPosts.map((post) => removeEmptyFields({
         caption: post.caption,
         likes: post.likes,
         comments: post.comments,
@@ -235,7 +245,8 @@ export default function DashboardPage() {
       audience,
       tone,
       format,
-    };
+    });
+
 
     const maxAttempts = 2;
     let attempt = 0;
@@ -287,48 +298,77 @@ export default function DashboardPage() {
       } finally {
         if (success || attempt >= maxAttempts) {
           setLoadingState("isGenerating", false);
+
+          if (success) {
+            setShowGenerationSuccess(true); // 🆕 Mostra o Toast de sucesso
+          }
         }
       }
     }
   };
 
+  const BATCH_SIZE = 3; // controla quantas transcrições simultâneas
+
   const startTranscription = async (posts: any[]) => {
     setOpen(true);
     setIsTranscribing(true);
-    setFailedPosts([]); // Resetar falhas
+    setFailedPosts([]);
 
-    const transcriptionResults: Record<string, string> = {};
+    const transcriptionResults: Record<string, string[]> = {};
     const failed: string[] = [];
 
     const MAX_ATTEMPTS = 3;
     const DELAY_BETWEEN_ATTEMPTS = 1000;
 
-    const fetchTranscription = async (post: any) => {
+    const normalizePostMedia = (post: any) => {
+      const images: string[] = [];
+      let video: string | undefined = undefined;
+
+      if (post?.post_content?.length > 0) {
+        const videoItem = post.post_content.find((content: any) => content.type === "Video");
+        if (videoItem) {
+          video = videoItem.url;
+        }
+      }
+
+      if (post?.images?.length > 0) {
+        for (const img of post.images) {
+          images.push(img.url);
+        }
+      } else if (post?.photos?.length > 0) {
+        for (const photo of post.photos) {
+          images.push(photo);
+        }
+      }
+
+      return { images, video };
+    };
+
+    const fetchTranscription = async (image_url?: string, video_url?: string) => {
       let attempt = 0;
+
+      if (!image_url && !video_url) {
+        return null;
+      }
 
       while (attempt < MAX_ATTEMPTS) {
         attempt++;
         try {
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCqVQzoDazrAzQjRwtnuUMBASqOZdya8eI`, {
+          const res = await fetch("/api/transcribe", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              contents: [
-              {
-                parts: [
-                {
-                  text: "Explain how AI works",
-                },
-                ],
-              },
-              ],
-              image_url: post.image_url,
-              video_url: post.video_url,
-              post_url: post.url,
+              image_url,
+              video_url,
             }),
-            });
+          });
+
+          if (res.status === 413) {
+            console.warn(`Arquivo muito grande para transcrição`);
+            return "Arquivo muito grande para transcrição.";
+          }
 
           if (!res.ok) {
             throw new Error(`Resposta não OK: ${res.status}`);
@@ -342,7 +382,7 @@ export default function DashboardPage() {
             throw new Error("Resposta sem transcrição");
           }
         } catch (error) {
-          console.error(`Erro ao transcrever (tentativa ${attempt}) para ${post.url}:`, error);
+          console.error(`Erro ao transcrever (tentativa ${attempt}):`, error);
 
           if (attempt < MAX_ATTEMPTS) {
             await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_ATTEMPTS));
@@ -354,22 +394,67 @@ export default function DashboardPage() {
     };
 
     let completed = 0;
+    const tasks: Promise<void>[] = [];
+
     for (const post of posts) {
-      const transcription = await fetchTranscription(post);
-      if (transcription) {
-        transcriptionResults[post.url] = transcription;
-      } else {
-        failed.push(post.url);
+      tasks.push((async () => {
+        const { images, video } = normalizePostMedia(post);
+        const postTranscriptions: string[] = [];
+
+        if (video) {
+          const transcription = await fetchTranscription(undefined, video);
+          if (transcription && transcription !== "Arquivo muito grande para transcrição.") {
+            postTranscriptions.push(transcription);
+          } else {
+            failed.push(post.url);
+          }
+        } else if (images.length > 0) {
+          for (const imageUrl of images) {
+            const transcription = await fetchTranscription(imageUrl, undefined);
+            if (transcription && transcription !== "Arquivo muito grande para transcrição.") {
+              postTranscriptions.push(transcription);
+            } else {
+              console.warn(`Imagem falhou: ${imageUrl}`);
+              // Não marca o post inteiro imediatamente
+            }
+          }
+        } else {
+          console.warn(`Post sem mídia utilizável: ${post.url}`);
+          failed.push(post.url);
+        }
+
+        if (postTranscriptions.length > 0) {
+          transcriptionResults[post.url] = postTranscriptions;
+        } else {
+          failed.push(post.url);
+        }
+
+        completed++;
+        setProgressInfo({ completed, total: posts.length });
+      })());
+
+      // Se chegamos no tamanho de batch, aguardamos
+      if (tasks.length >= BATCH_SIZE) {
+        await Promise.all(tasks.splice(0, BATCH_SIZE));
       }
-      completed++;
-      setProgressInfo({ completed, total: posts.length });
     }
+
+    // Aguarda tasks restantes
+    await Promise.all(tasks);
 
     setTranscriptions(transcriptionResults);
     setFailedPosts(failed);
     setIsTranscribing(false);
     setOpen(false);
   };
+
+  function removeEmptyFields(obj: any): any {
+    return Object.entries(obj)
+      .filter(([_, v]) => v !== undefined && v !== null && v !== "")
+      .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
+  }
+
+
 
 
 
@@ -498,7 +583,7 @@ export default function DashboardPage() {
               completed={completedStates.format}
             />
           </div>
-          {isTranscribing && (
+          {/* {isTranscribing && (
             <div className="p-4 bg-yellow-100 text-yellow-800 rounded-md">
               <span className="animate-spin">⏳</span>
               Estamos processando as transcrições dos posts selecionados...
@@ -509,7 +594,7 @@ export default function DashboardPage() {
               <span className="animate-pulse">🚀</span>
               Transcrições concluídas! Pronto para gerar o conteúdo. Clique no botão acima.
             </div>
-          )}
+          )} */}
 
           {/* Botão oculto para gerar conteúdo */}
           <Button id="generate-button" onClick={handleGenerateContent} className="hidden" />
@@ -530,28 +615,52 @@ export default function DashboardPage() {
             </div>
           )} */}
 
-          {generatedContent && (
-            <div ref={generatedRef} className="mt-8 space-y-4">
-              <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
-              {generatedContent.map((item, index) => (
-                <div key={index} className="p-4 border rounded-md bg-white dark:bg-neutral-900 shadow-sm">
-                  <p className="whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
-                    {item.caption}
-                  </p>
-                  {item.referencePostUrl && (
-                    <a
-                      href={item.referencePostUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 text-sm underline mt-2 inline-block"
-                    >
-                      Ver post original
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+{generatedContent && (
+  <div ref={generatedRef} className="mt-8 space-y-6">
+    <div className="flex items-center justify-between">
+      <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleGenerateContent}
+        >
+          🔄 Gerar Novamente
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => {
+            if (confirm("Tem certeza que deseja reiniciar? Você perderá todo o progresso atual.")) {
+              window.location.reload();
+            }
+          }}
+        >
+          🧹 Reiniciar
+        </Button>
+      </div>
+    </div>
+
+    {generatedContent.map((item, index) => (
+      <div key={index} className="p-4 border rounded-md bg-white dark:bg-neutral-900 shadow-sm">
+        <p className="whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
+          {item.caption}
+        </p>
+        {item.referencePostUrl && (
+          <a
+            href={item.referencePostUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 dark:text-blue-400 text-sm underline mt-2 inline-block"
+          >
+            Ver post original
+          </a>
+        )}
+      </div>
+    ))}
+  </div>
+)}
+
 
 
 
@@ -560,54 +669,88 @@ export default function DashboardPage() {
 
 
       {/* Painel Flutuante de Progresso */}
-      {(isTranscribing || failedPosts.length > 0) && (
-       <Toast.Provider swipeDirection="right">
-       <Toast.Root
-         open={open && (isTranscribing || failedPosts.length > 0)}
-         onOpenChange={setOpen}
-         className="bg-white dark:bg-neutral-900 border shadow-lg rounded-lg p-4 w-80 z-[999]"
-       >
-         <Toast.Title className="font-semibold mb-1">
-           {isTranscribing
-             ? "Transcrevendo posts..."
-             : failedPosts.length > 0
-             ? `Falha em ${failedPosts.length} posts`
-             : "Tudo pronto! 🚀"}
-         </Toast.Title>
-     
-         {isTranscribing && (
-           <>
-             <Toast.Description className="text-sm text-muted-foreground mb-2">
-               {progressInfo.completed}/{progressInfo.total} concluídos
-             </Toast.Description>
-             <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
-               <div
-                 className="bg-blue-500 h-2 rounded-full transition-all"
-                 style={{ width: `${(progressInfo.completed / progressInfo.total) * 100}%` }}
-               />
-             </div>
-           </>
-         )}
-     
-         {!isTranscribing && failedPosts.length > 0 && (
-           <Button
-             variant="outline"
-             size="sm"
-             className="mt-2"
-             onClick={() => {
-               setOpen(false);
-               startTranscription(referencePosts.filter((p) => failedPosts.includes(p.url)));
-             }}
-           >
-             Tentar novamente
-           </Button>
-         )}
-       </Toast.Root>
-     
-       <Toast.Viewport className="fixed bottom-6 right-6 flex flex-col gap-2 w-96 max-w-screen-sm z-[999]" />
-     </Toast.Provider>
-     
-      )}
+      <Toast.Provider swipeDirection="right" duration={Infinity}>
+        {/* Toast de transcrição ou falha */}
+        {open && (
+          <Toast.Root
+            onOpenChange={setOpen}
+            className="bg-white dark:bg-neutral-900 border shadow-lg rounded-lg p-4 w-80 z-[999]"
+          >
+            <Toast.Title className="font-semibold mb-1">
+              {isTranscribing
+                ? "Transcrevendo posts..."
+                : failedPosts.length > 0
+                  ? `Falha em ${failedPosts.length} posts`
+                  : "Tudo pronto! 🚀"}
+            </Toast.Title>
+
+            {isTranscribing && (
+              <>
+                <Toast.Description className="text-sm text-muted-foreground mb-2">
+                  {progressInfo.completed}/{progressInfo.total} concluídos<br />
+                  Estimativa restante: {estimatedRemaining}
+                </Toast.Description>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden mt-2">
+                  <div
+                    className="bg-blue-500 h-2 rounded-full transition-all"
+                    style={{ width: `${(progressInfo.completed / progressInfo.total) * 100}%` }}
+                  />
+                </div>
+              </>
+            )}
+
+            {!isTranscribing && failedPosts.length > 0 && (
+              <>
+                <p className="text-sm text-red-600 mt-2">Falhou em:</p>
+                <ul className="list-disc pl-5 text-sm">
+                  {failedPosts.map((postUrl, index) => (
+                    <li key={index}>
+                      <a
+                        href={postUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 underline"
+                      >
+                        {postUrl}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-4"
+                  onClick={() => {
+                    setOpen(false);
+                    startTranscription(referencePosts.filter((p) => failedPosts.includes(p.url)));
+                  }}
+                >
+                  Tentar novamente
+                </Button>
+              </>
+            )}
+          </Toast.Root>
+        )}
+
+        {/* Toast de sucesso na geração */}
+        {showGenerationSuccess && (
+          <Toast.Root
+            onOpenChange={setShowGenerationSuccess}
+            duration={4000}
+            className="bg-green-100 border border-green-300 dark:bg-green-900 dark:border-green-700 shadow-lg rounded-lg p-4 w-80 z-[999]"
+          >
+            <Toast.Title className="font-semibold text-green-700 dark:text-green-300">
+              ✅ Conteúdo gerado com sucesso!
+            </Toast.Title>
+            <Toast.Description className="text-sm text-green-600 dark:text-green-400 mt-1">
+              Seu post está pronto para ser usado 🚀
+            </Toast.Description>
+          </Toast.Root>
+        )}
+
+        <Toast.Viewport className="fixed bottom-6 right-6 flex flex-col gap-2 w-96 max-w-screen-sm z-[999]" />
+      </Toast.Provider>
 
 
     </AppPageShell>
