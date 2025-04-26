@@ -14,6 +14,9 @@ import { StepTone } from "@/components/Stepper/StepTone";
 import { StepFormat } from "@/components/Stepper/StepFormat";
 import { Button } from "@/components/ui/button";
 
+import * as Toast from "@radix-ui/react-toast";
+
+
 export default function DashboardPage() {
 
   const [loadingStates, setLoadingStates] = useState({
@@ -67,11 +70,20 @@ export default function DashboardPage() {
   const [tone, setTone] = useState("");
   const [format, setFormat] = useState("");
 
+  const [transcriptions, setTranscriptions] = useState<Record<string, string>>({});
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [progressInfo, setProgressInfo] = useState({ completed: 0, total: 0 });
+  const [failedPosts, setFailedPosts] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
+
+
+
+
 
   useEffect(() => {
     console.log("📌 Reference Username:", referenceUsername);
     console.log("📌 Reference Profile:", referenceProfile);
-    console.log("📌 Reference Posts:", referencePosts);
+    console.log("📌 Selected Posts:", selectedPosts);
   }, [referenceUsername, referenceProfile, referencePosts]);
 
 
@@ -105,7 +117,7 @@ export default function DashboardPage() {
         const now = Date.now();
         const cacheAge = now - (parsed._cachedAt || 0);
 
-        if (cacheAge < 120 * 60 * 1000) { // Cache válido por 2h (120 minutos)
+        if (cacheAge < 24 * 60 * 60 * 1000) { // Cache válido por 24 horas 
           setReferenceProfile(parsed.profile);
           setReferencePosts(parsed.posts);
           setReferenceUsername(sanitized);
@@ -216,6 +228,7 @@ export default function DashboardPage() {
         url: post.url,
         image_url: typeof post.image_url === "string" ? post.image_url : undefined,
         video_url: typeof post.video_url === "string" ? post.video_url : undefined,
+        transcription: transcriptions[post.url] || null,
       })),
       goal,
       niche,
@@ -279,6 +292,85 @@ export default function DashboardPage() {
     }
   };
 
+  const startTranscription = async (posts: any[]) => {
+    setOpen(true);
+    setIsTranscribing(true);
+    setFailedPosts([]); // Resetar falhas
+
+    const transcriptionResults: Record<string, string> = {};
+    const failed: string[] = [];
+
+    const MAX_ATTEMPTS = 3;
+    const DELAY_BETWEEN_ATTEMPTS = 1000;
+
+    const fetchTranscription = async (post: any) => {
+      let attempt = 0;
+
+      while (attempt < MAX_ATTEMPTS) {
+        attempt++;
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCqVQzoDazrAzQjRwtnuUMBASqOZdya8eI`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              contents: [
+              {
+                parts: [
+                {
+                  text: "Explain how AI works",
+                },
+                ],
+              },
+              ],
+              image_url: post.image_url,
+              video_url: post.video_url,
+              post_url: post.url,
+            }),
+            });
+
+          if (!res.ok) {
+            throw new Error(`Resposta não OK: ${res.status}`);
+          }
+
+          const data = await res.json();
+
+          if (data?.transcription) {
+            return data.transcription;
+          } else {
+            throw new Error("Resposta sem transcrição");
+          }
+        } catch (error) {
+          console.error(`Erro ao transcrever (tentativa ${attempt}) para ${post.url}:`, error);
+
+          if (attempt < MAX_ATTEMPTS) {
+            await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_ATTEMPTS));
+          }
+        }
+      }
+
+      return null;
+    };
+
+    let completed = 0;
+    for (const post of posts) {
+      const transcription = await fetchTranscription(post);
+      if (transcription) {
+        transcriptionResults[post.url] = transcription;
+      } else {
+        failed.push(post.url);
+      }
+      completed++;
+      setProgressInfo({ completed, total: posts.length });
+    }
+
+    setTranscriptions(transcriptionResults);
+    setFailedPosts(failed);
+    setIsTranscribing(false);
+    setOpen(false);
+  };
+
 
 
 
@@ -322,7 +414,10 @@ export default function DashboardPage() {
                 posts={referencePosts}
                 onNext={(posts) => {
 
-                  nextIfValid("posts", () => setSelectedPosts(posts));
+                  nextIfValid("posts", () => {
+                    setSelectedPosts(posts);
+                    startTranscription(posts);
+                  });
                 }}
                 disabled={!isStepEnabled(1)}
               />
@@ -399,10 +494,24 @@ export default function DashboardPage() {
               }}
 
               disabled={!isStepEnabled(6)}
-              loading={loadingStates.isLoadingFormat}
+              loading={loadingStates.isLoadingFormat || isTranscribing}
               completed={completedStates.format}
             />
           </div>
+          {isTranscribing && (
+            <div className="p-4 bg-yellow-100 text-yellow-800 rounded-md">
+              <span className="animate-spin">⏳</span>
+              Estamos processando as transcrições dos posts selecionados...
+            </div>
+          )}
+          {transcriptions && Object.keys(transcriptions).length > 0 && !isTranscribing && (
+            <div className="p-4 bg-green-100 text-green-800 rounded-md">
+              <span className="animate-pulse">🚀</span>
+              Transcrições concluídas! Pronto para gerar o conteúdo. Clique no botão acima.
+            </div>
+          )}
+
+          {/* Botão oculto para gerar conteúdo */}
           <Button id="generate-button" onClick={handleGenerateContent} className="hidden" />
 
           {/* Se todos os passos estiverem completos, exibe o botão de gerar conteúdo */}
@@ -448,6 +557,59 @@ export default function DashboardPage() {
 
         </div>
       </div>
+
+
+      {/* Painel Flutuante de Progresso */}
+      {(isTranscribing || failedPosts.length > 0) && (
+       <Toast.Provider swipeDirection="right">
+       <Toast.Root
+         open={open && (isTranscribing || failedPosts.length > 0)}
+         onOpenChange={setOpen}
+         className="bg-white dark:bg-neutral-900 border shadow-lg rounded-lg p-4 w-80 z-[999]"
+       >
+         <Toast.Title className="font-semibold mb-1">
+           {isTranscribing
+             ? "Transcrevendo posts..."
+             : failedPosts.length > 0
+             ? `Falha em ${failedPosts.length} posts`
+             : "Tudo pronto! 🚀"}
+         </Toast.Title>
+     
+         {isTranscribing && (
+           <>
+             <Toast.Description className="text-sm text-muted-foreground mb-2">
+               {progressInfo.completed}/{progressInfo.total} concluídos
+             </Toast.Description>
+             <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+               <div
+                 className="bg-blue-500 h-2 rounded-full transition-all"
+                 style={{ width: `${(progressInfo.completed / progressInfo.total) * 100}%` }}
+               />
+             </div>
+           </>
+         )}
+     
+         {!isTranscribing && failedPosts.length > 0 && (
+           <Button
+             variant="outline"
+             size="sm"
+             className="mt-2"
+             onClick={() => {
+               setOpen(false);
+               startTranscription(referencePosts.filter((p) => failedPosts.includes(p.url)));
+             }}
+           >
+             Tentar novamente
+           </Button>
+         )}
+       </Toast.Root>
+     
+       <Toast.Viewport className="fixed bottom-6 right-6 flex flex-col gap-2 w-96 max-w-screen-sm z-[999]" />
+     </Toast.Provider>
+     
+      )}
+
+
     </AppPageShell>
   );
 }

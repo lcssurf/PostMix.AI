@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Post, PostCard } from "./PostCard";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 
 type Props = {
   posts: Post[];
@@ -39,6 +40,11 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
       prev.includes(strId) ? prev.filter((i) => i !== strId) : [...prev, strId].slice(0, 3)
     );
   };
+
+  useEffect(() => {
+    console.log("Selected IDs:", selected);
+    console.log("Post IDs:", posts.map((p) => p.post_id));
+  }, [selected, posts]);
 
   const proxiedImage = profile?.profile_image_link
     ? `/api/proxy-image?url=${encodeURIComponent(profile.profile_image_link)}`
