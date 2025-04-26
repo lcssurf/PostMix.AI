@@ -77,6 +77,8 @@ export default function DashboardPage() {
   const [open, setOpen] = useState(false);
 
   const [showGenerationSuccess, setShowGenerationSuccess] = useState(false);
+  const [showGeneratingToast, setShowGeneratingToast] = useState(false);
+
 
 
   const estimatedSeconds = Math.ceil((progressInfo.total - progressInfo.completed) * 2);
@@ -201,7 +203,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const ref = stepRefs[stepIndex]?.current;
     if (ref) {
-      const blockPosition = stepIndex === 1 ? "start" : "center"; // index 1 = StepPostSelection
+      const blockPosition = stepIndex === 1 || generatedRef.current ? "start" : "center"; // index 1 = StepPostSelection or generatedRef
       ref.scrollIntoView({ behavior: "smooth", block: blockPosition });
     }
   }, [stepIndex]);
@@ -213,6 +215,8 @@ export default function DashboardPage() {
 
   const handleGenerateContent = async () => {
     setLoadingState("isGenerating", true);
+    setShowGeneratingToast(true); // Mostra o Toast de carregamento
+
 
     const cleanedPosts = selectedPosts.map((post) => ({
       ...post,
@@ -296,6 +300,7 @@ export default function DashboardPage() {
           await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
         }
       } finally {
+        setShowGeneratingToast(false); // Esconde o Toast de carregamento
         if (success || attempt >= maxAttempts) {
           setLoadingState("isGenerating", false);
 
@@ -310,6 +315,7 @@ export default function DashboardPage() {
   const BATCH_SIZE = 3; // controla quantas transcrições simultâneas
 
   const startTranscription = async (posts: any[]) => {
+    setProgressInfo({ completed: 0, total: posts.length });
     setOpen(true);
     setIsTranscribing(true);
     setFailedPosts([]);
@@ -615,51 +621,55 @@ export default function DashboardPage() {
             </div>
           )} */}
 
-{generatedContent && (
-  <div ref={generatedRef} className="mt-8 space-y-6">
-    <div className="flex items-center justify-between">
-      <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleGenerateContent}
-        >
-          🔄 Gerar Novamente
-        </Button>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => {
-            if (confirm("Tem certeza que deseja reiniciar? Você perderá todo o progresso atual.")) {
-              window.location.reload();
-            }
-          }}
-        >
-          🧹 Reiniciar
-        </Button>
-      </div>
-    </div>
+          {generatedContent && (
+            <div ref={generatedRef} className="mt-8 space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
+                <div className="flex gap-2">
 
-    {generatedContent.map((item, index) => (
-      <div key={index} className="p-4 border rounded-md bg-white dark:bg-neutral-900 shadow-sm">
-        <p className="whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
-          {item.caption}
-        </p>
-        {item.referencePostUrl && (
-          <a
-            href={item.referencePostUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 text-sm underline mt-2 inline-block"
-          >
-            Ver post original
-          </a>
-        )}
-      </div>
-    ))}
-  </div>
-)}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateContent}
+                    disabled={loadingStates.isGenerating}
+                  >
+                    {loadingStates.isGenerating ? "Gerando..." : "🔄 Gerar Novamente"}
+                  </Button>
+
+
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm("Tem certeza que deseja reiniciar? Você perderá todo o progresso atual.")) {
+                        window.location.reload();
+                      }
+                    }}
+                  >
+                    🧹 Reiniciar
+                  </Button>
+                </div>
+              </div>
+
+              {generatedContent.map((item, index) => (
+                <div key={index} className="p-4 border rounded-md bg-white dark:bg-neutral-900 shadow-sm">
+                  <p className="whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
+                    {item.caption}
+                  </p>
+                  {item.referencePostUrl && (
+                    <a
+                      href={item.referencePostUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 dark:text-blue-400 text-sm underline mt-2 inline-block"
+                    >
+                      Ver post original
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
 
 
@@ -730,6 +740,21 @@ export default function DashboardPage() {
                 </Button>
               </>
             )}
+          </Toast.Root>
+        )}
+
+        {showGeneratingToast && (
+          <Toast.Root
+            onOpenChange={setShowGeneratingToast}
+            duration={Infinity}
+            className="bg-blue-100 border border-blue-300 dark:bg-blue-900 dark:border-blue-700 shadow-lg rounded-lg p-4 w-80 z-[999]"
+          >
+            <Toast.Title className="font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                <span className="animate-[spin_2s_linear_infinite]">⏳</span>Gerando conteúdo...
+            </Toast.Title>
+            <Toast.Description className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+              Estamos criando seu post personalizado. Isso pode levar alguns minutos 🚀
+            </Toast.Description>
           </Toast.Root>
         )}
 
