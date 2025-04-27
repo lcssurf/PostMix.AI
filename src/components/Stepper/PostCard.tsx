@@ -33,7 +33,7 @@ export function PostCard({ post, selected, toggleSelect, disabled }: PostCardPro
     <div
       onClick={!disabled ? toggleSelect : undefined}
       className={cn(
-        "border rounded-lg overflow-hidden transition shadow-sm",
+        "border rounded-lg overflow-hidden transition shadow-sm w-full",
         selected ? "border-primary ring-2 ring-primary/40" : "border-border",
         disabled ? "opacity-50 pointer-events-none select-none" : "cursor-pointer"
       )}

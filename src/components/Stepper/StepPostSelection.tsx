@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Post, PostCard } from "./PostCard";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 
@@ -30,8 +30,8 @@ type Props = {
 
 export function StepPostSelection({ posts, onNext, disabled, completed, loading, profile }: Props) {
 
-  console.log("StepPostSelection posts", posts);
-  
+  const analyzeButtonRef = useRef<HTMLButtonElement | null>(null);
+
   const [selected, setSelected] = useState<string[]>([]);
 
   const toggle = (id: string | number) => {
@@ -39,11 +39,19 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
     setSelected((prev) =>
       prev.includes(strId) ? prev.filter((i) => i !== strId) : [...prev, strId].slice(0, 3)
     );
+
+    
+
   };
 
   useEffect(() => {
     console.log("Selected IDs:", selected);
     console.log("Post IDs:", posts.map((p) => p.post_id));
+    if (selected.length === 3) {
+      setTimeout(() => {
+        analyzeButtonRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 300);
+    }
   }, [selected, posts]);
 
   const proxiedImage = profile?.profile_image_link
@@ -127,7 +135,7 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
 
       </CardHeader>
 
-      <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {posts?.map((post) => (
           <PostCard
             key={post.post_id}
@@ -140,6 +148,7 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
         {!disabled && (
           <div className="col-span-full">
             <Button
+            ref={analyzeButtonRef}
               onClick={() =>
                 onNext(posts.filter((p) => selected.includes(String(p.post_id))))
               }

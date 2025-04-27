@@ -210,10 +210,13 @@ export default function DashboardPage() {
   useEffect(() => {
     const ref = stepRefs[stepIndex]?.current;
     if (ref) {
-      const blockPosition = stepIndex === 1 || generatedRef.current ? "start" : "center"; // index 1 = StepPostSelection or generatedRef
+      const blockPosition = stepIndex === 1 ? "start" : "center"; // index 1 = StepPostSelection or generatedRef
       ref.scrollIntoView({ behavior: "smooth", block: blockPosition });
     }
   }, [stepIndex]);
+
+  const generateButtonRef = useRef<HTMLButtonElement | null>(null);
+
 
 
 
@@ -292,7 +295,7 @@ export default function DashboardPage() {
 
         setGeneratedContent(result.content);
         setTimeout(() => {
-          generatedRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          generatedRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 300);
         console.log("✅ Conteúdo gerado:", result);
         success = true;
@@ -586,19 +589,23 @@ export default function DashboardPage() {
               onSelect={(f) => {
                 nextIfValid("format", () => {
                   setFormat(f);
+                  setTimeout(() => {
+                    generateButtonRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }, 300);
+                  
 
                   // 🔽 Log dos dados finais preenchidos
-                  console.log("🧠 Dados finalizados para geração:");
-                  console.log({
-                    referenceUsername,
-                    referenceProfile,
-                    selectedPosts,
-                    goal,
-                    niche,
-                    audience,
-                    tone,
-                    format: f,
-                  });
+                  // console.log("🧠 Dados finalizados para geração:");
+                  // console.log({
+                  //   referenceUsername,
+                  //   referenceProfile,
+                  //   selectedPosts,
+                  //   goal,
+                  //   niche,
+                  //   audience,
+                  //   tone,
+                  //   format: f,
+                  // });
                 });
               }}
 
@@ -621,7 +628,7 @@ export default function DashboardPage() {
           )} */}
 
           {/* Botão oculto para gerar conteúdo */}
-          <Button id="generate-button" onClick={handleGenerateContent} className="hidden" />
+          <Button ref={generateButtonRef} id="generate-button" onClick={handleGenerateContent} className="hidden" />
 
           {/* Se todos os passos estiverem completos, exibe o botão de gerar conteúdo */}
           {/* {Object.entries(completedStates).every(([key, value]) => key !== "isGenerating" && value) && (
@@ -792,7 +799,7 @@ export default function DashboardPage() {
           </Toast.Root>
         )}
 
-        <Toast.Viewport className="fixed bottom-6 right-6 flex flex-col gap-2 w-96 max-w-screen-sm z-[999]" />
+        <Toast.Viewport className="fixed bottom-6 md:right-6 flex flex-col gap-2 w-96 max-w-screen-sm z-[999]" />
       </Toast.Provider>
 
 
