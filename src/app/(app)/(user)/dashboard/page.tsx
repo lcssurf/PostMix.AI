@@ -476,8 +476,7 @@ export default function DashboardPage() {
   return (
     <AppPageShell title={dashboardPageConfig.title} description={dashboardPageConfig.description}>
 
-      <div className="grid md:grid-cols-[220px_1fr] gap-8 mt-6">
-
+      <div className="flex flex-col md:flex-row gap-8 mt-6">
 
         {/* Barra lateral com sticky */}
         <div className="relative">

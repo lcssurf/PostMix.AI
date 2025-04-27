@@ -7,7 +7,8 @@ type Props = {
 
 export function VerticalStepIndicator({ steps, currentIndex }: Props) {
   return (
-    <div className="flex flex-row md:flex-col items-start gap-4 md:gap-6 md:border-r md:pr-4">
+    <div className="flex flex-row flex-wrap md:flex-col items-start gap-4 md:gap-6 md:border-r md:pr-4">
+
       {steps.map((step, index) => {
         const isActive = index === currentIndex;
         const isCompleted = index < currentIndex;
