@@ -37,15 +37,15 @@ const navIds = {
 const navigation: UserDropdownNavItems[] = [
     {
         id: navIds.profile,
-        label: "Profile",
+        label: "Geral",
         items: [
             {
-                label: "Dashboard",
+                label: "Análise de Perfis",
                 icon: LayoutDashboardIcon,
                 href: siteUrls.dashboard.home,
             },
             {
-                label: "Settings",
+                label: "Configurações",
                 icon: Settings2Icon,
                 href: siteUrls.profile.settings,
             },

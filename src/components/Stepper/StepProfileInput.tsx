@@ -48,7 +48,7 @@ export function StepProfileInput({ onSubmit, disabled, loading, error, completed
         />
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        <Button onClick={handleSubmit(onSubmit)} disabled={disabled || loading || completed}>
+        <Button className="w-full" onClick={handleSubmit(onSubmit)} disabled={disabled || loading || completed}>
           {loading ? (
             <div className="flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />

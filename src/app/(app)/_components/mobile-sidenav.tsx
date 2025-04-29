@@ -19,7 +19,7 @@ export function MobileSidenav({
             <SheetTrigger asChild>
                 <Button variant="outline" size="iconSmall">
                     <MenuIcon className="h-4 w-4" />
-                    <p className="sr-only">Open menu</p>
+                    <p className="sr-only">Abrir menu</p>
                 </Button>
             </SheetTrigger>
             <SheetContent side="left" className="px-3 pb-20 pt-10">
@@ -29,6 +29,7 @@ export function MobileSidenav({
                     sidebarNavIncludeIds={sidebarNavIncludeIds}
                     sidebarNavRemoveIds={sidebarNavRemoveIds}
                 />
+               
             </SheetContent>
         </Sheet>
     );

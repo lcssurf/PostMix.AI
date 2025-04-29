@@ -96,11 +96,11 @@ export function UserImageForm({ user }: UserImageFormProps) {
 
             setFiles([]);
             setModalOpen(false);
-            toast.success("Image uploaded successfully");
+            toast.success("Imagem enviada com sucesso");
         } catch (error) {
             toast.error(
                 (error as { message?: string })?.message ??
-                    "Image could not be uploaded",
+                    "Não foi possível enviar a imagem",
             );
         }
     };
@@ -117,9 +117,9 @@ export function UserImageForm({ user }: UserImageFormProps) {
         >
             <Card>
                 <CardHeader>
-                    <CardTitle>Profile Image</CardTitle>
+                    <CardTitle>Imagem de Perfil</CardTitle>
                     <CardDescription>
-                        Add a profile image to make your account more personal.
+                        Adicione uma imagem de perfil para tornar sua conta mais pessoal.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex items-center gap-4">
@@ -133,25 +133,25 @@ export function UserImageForm({ user }: UserImageFormProps) {
 
                     <div>
                         <p className="text-sm font-light text-muted-foreground">
-                            Max file size: {PROFILE_MAX_SIZE}MB
+                            Tamanho máximo do arquivo: {PROFILE_MAX_SIZE}MB
                         </p>
                         <p className="text-sm font-light text-muted-foreground">
-                            Recommended size: 600x600
+                            Tamanho recomendado: 600x600
                         </p>
                     </div>
                 </CardContent>
                 <CardFooter>
                     <DialogTrigger asChild>
-                        <Button type="button">Upload Image</Button>
+                        <Button type="button">Enviar Imagem</Button>
                     </DialogTrigger>
                 </CardFooter>
             </Card>
 
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Upload a new profile image here</DialogTitle>
+                    <DialogTitle>Envie uma nova imagem de perfil aqui</DialogTitle>
                     <DialogDescription>
-                        Drag and drop the image here, or click to select a file
+                        Arraste e solte a imagem aqui, ou clique para selecionar um arquivo
                     </DialogDescription>
                 </DialogHeader>
 
@@ -201,7 +201,7 @@ export function UserImageForm({ user }: UserImageFormProps) {
                             type="button"
                             variant="outline"
                         >
-                            Cancel
+                            Cancelar
                         </Button>
                     </DialogClose>
                     <Button

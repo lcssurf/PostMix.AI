@@ -35,7 +35,7 @@ export function StepAudience({ defaultValue = "", onNext, disabled, loading, com
         onChange={(e) => setAudience(e.target.value)}
         disabled={disabled}
       />
-      <Button onClick={handleSubmit} disabled={disabled || !audience.trim() || loading || completed}>
+      <Button className="w-full" onClick={handleSubmit} disabled={disabled || !audience.trim() || loading || completed}>
         {loading ? "Carregando..." : completed ? "Concluído" : "Continuar"}
       </Button>
     </div>

@@ -12,13 +12,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
         <Fragment>
             <SwtichOrgLoading />
             {children}
-
             <Suspense fallback={null}>
                 <NewUserSetup />
             </Suspense>
-            <Suspense fallback={null}>
+            
+            {/* <Suspense fallback={null}>
                 <CreateFirstOrgForm />
-            </Suspense>
+            </Suspense> */}
         </Fragment>
     );
 }

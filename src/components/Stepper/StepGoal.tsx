@@ -52,7 +52,7 @@ export function StepGoal({ value, onSelect, disabled, completed, loading }: Step
         <Button
           onClick={() => onSelect(tempGoal)}
           disabled={disabled || loading || completed}
-          className="mt-4"
+          className="mt-4 w-full"
         >
           {loading ? "Carregando..." : completed ? "Concluído" : "Continuar"}
         </Button>

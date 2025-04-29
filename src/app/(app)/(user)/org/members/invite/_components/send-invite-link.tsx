@@ -93,7 +93,7 @@ export function SendInviteLink({ inviteLink, orgName }: SendInviteLinkProps) {
                                 <FormControl>
                                     <Input
                                         className="bg-background w-full"
-                                        placeholder="hey@example.com"
+                                        placeholder="seuemail@exemplo.com"
                                         {...field}
                                     />
                                 </FormControl>

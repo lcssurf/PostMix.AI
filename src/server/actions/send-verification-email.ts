@@ -19,31 +19,31 @@ export async function sendVerificationEmail({
         await resend.emails.send({
             from: siteConfig.noReplyEmail,
             to: params.identifier,
-            subject: `Verify your email address | ${siteConfig.name}`,
+            subject: `Verifique seu endereço de email | ${siteConfig.name}`,
             html: `
-                <div>
-                    <a href="${siteUrls.rapidlaunch}">${siteConfig.name}</a>
-                    <h1>🪄 Your magic link</h1>
-                    <p>
-                        Click the link below to verify your email address and
-                        sign in.
-                    </p>
-                    <a href="${params.url}">Verify your email</a>
+            <div>
+                <a href="${siteUrls.rapidlaunch}">${siteConfig.name}</a>
+                <h1>🪄 Seu link mágico</h1>
+                <p>
+                Clique no link abaixo para verificar seu endereço de email e
+                fazer login.
+                </p>
+                <a href="${params.url}">Verifique seu email</a>
 
-                    <p> or </p>
+                <p> ou </p>
 
-                    <p>
-                        Copy and paste the following link in your browser:
-                        <br />
-                        ${params.url}
-                    </p>
+                <p>
+                Copie e cole o seguinte link no seu navegador:
+                <br />
+                ${params.url}
+                </p>
 
-                    <hr />
-                    <p>
-                        If you didn't request this email, you can ignore it.
-                    </p>
-                </div>`,
-            text: `Click the link below to verify your email address and sign in. ${params.url}`,
+                <hr />
+                <p>
+                Se você não solicitou este email, pode ignorá-lo.
+                </p>
+            </div>`,
+            text: `Clique no link abaixo para verificar seu endereço de email e fazer login. ${params.url}`,
             tags: [
                 {
                     name: "category",
@@ -52,6 +52,6 @@ export async function sendVerificationEmail({
             ],
         });
     } catch (error) {
-        throw new Error("Failed to send verification email");
+        throw new Error("Falha ao enviar o email de verificação");
     }
 }

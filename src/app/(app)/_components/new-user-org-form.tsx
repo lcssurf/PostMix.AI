@@ -130,7 +130,7 @@ export function NewUserOrgForm({
                                     <FormLabel>Org Email</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="hey@example.com"
+                                            placeholder="seuemail@exemplo.com"
                                             {...field}
                                         />
                                     </FormControl>

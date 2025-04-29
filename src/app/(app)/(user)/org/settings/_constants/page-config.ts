@@ -1,5 +1,5 @@
 export const orgSettingsPageConfig = {
-    title: "Organization Settings",
+    title: "Configurações da Organização",
     description:
-        "Manage your organization settings here, such as organization name, logo, and more!",
+        "Gerencie as configurações da sua organização aqui, como nome da organização, logo e muito mais!",
 } as const;

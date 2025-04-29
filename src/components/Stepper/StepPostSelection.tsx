@@ -40,7 +40,7 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
       prev.includes(strId) ? prev.filter((i) => i !== strId) : [...prev, strId].slice(0, 3)
     );
 
-    
+
 
   };
 
@@ -135,7 +135,7 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
 
       </CardHeader>
 
-      <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {posts?.map((post) => (
           <PostCard
             key={post.post_id}
@@ -158,7 +158,32 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
             </Button>
           </div>
         )}
+      </CardContent> */}
+      <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-28">
+        {posts?.map((post) => (
+          <PostCard
+            key={post.post_id}
+            post={post}
+            selected={selected.includes(String(post.post_id))}
+            toggleSelect={() => toggle(post.post_id)}
+            disabled={disabled}
+          />
+        ))}
       </CardContent>
+
+      {!disabled && (
+        <div className="sticky bottom-0 left-0 w-full bg-white dark:bg-background z-50 px-4 py-3 border-t">
+          <Button
+            ref={analyzeButtonRef}
+            onClick={() => onNext(posts.filter((p) => selected.includes(String(p.post_id))))}
+            disabled={selected.length === 0 || loading || completed}
+            className="w-full"
+          >
+            {loading ? "Carregando..." : completed ? "Concluído" : "Analisar"}
+          </Button>
+        </div>
+      )}
+
     </Card>
   );
 }

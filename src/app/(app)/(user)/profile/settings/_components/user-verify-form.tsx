@@ -38,9 +38,9 @@ export function UserVerifyForm({ user }: UserVerifyFormProps) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Verify your email</CardTitle>
+                <CardTitle>Verifique seu email</CardTitle>
                 <CardDescription>
-                    Verify your email to enable all features
+                    Verifique seu email para habilitar todos os recursos
                 </CardDescription>
             </CardHeader>
             <CardFooter>
@@ -50,7 +50,7 @@ export function UserVerifyForm({ user }: UserVerifyFormProps) {
                     className="gap-2"
                 >
                     {isPending ? <Icons.loader className="h-4 w-4" /> : null}
-                    <span>Verify Email</span>
+                    <span>Verificar Email</span>
                 </Button>
             </CardFooter>
         </Card>

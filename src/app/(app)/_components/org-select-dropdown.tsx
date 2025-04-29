@@ -90,14 +90,14 @@ export function OrgSelectDropdown({
                             <span className="truncate">{currentOrg?.name}</span>
                         )}
 
-                        <span className="sr-only">org select menu</span>
+                        <span className="sr-only">menu de seleção de organização</span>
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="z-50 w-60 p-0" align="start">
                     <Command>
                         <CommandList>
-                            <CommandInput placeholder="Search team..." />
-                            <CommandEmpty>No team found.</CommandEmpty>
+                            <CommandInput placeholder="Pesquisar equipe..." />
+                            <CommandEmpty>Nenhuma equipe encontrada.</CommandEmpty>
 
                             {userOrgs.map((group, index) => (
                                 <CommandGroup
@@ -138,7 +138,7 @@ export function OrgSelectDropdown({
                                         ))
                                     ) : (
                                         <p className="px-2 text-xs font-light text-muted-foreground">
-                                            No organization found.
+                                            Nenhuma organização encontrada.
                                         </p>
                                     )}
                                 </CommandGroup>
@@ -154,7 +154,7 @@ export function OrgSelectDropdown({
                                     >
                                         <PlusCircledIcon className="h-4 w-4" />
                                         <span className="font-medium">
-                                            Create Organization
+                                            Criar Organização
                                         </span>
                                     </button>
                                 </CommandItem>

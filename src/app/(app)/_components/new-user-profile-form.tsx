@@ -31,6 +31,7 @@ import { updateNameMutation } from "@/server/actions/user/mutations";
 import { useAwaitableTransition } from "@/hooks/use-awaitable-transition";
 import { siteConfig } from "@/config/site";
 import { new_user_setup_step_cookie } from "@/config/cookie-keys";
+import { createOrgMutation } from "@/server/actions/organization/mutations";
 
 const profileFormSchema = z.object({
     name: z
@@ -60,26 +61,35 @@ export function NewUserProfileForm({
         },
     });
 
-    const { isPending: isMutatePending, mutateAsync } = useMutation({
+    const { isPending: isMutatePending, mutateAsync: updateNameMutate  } = useMutation({
         mutationFn: () => updateNameMutation({ name: form.getValues().name }),
     });
+
+    const { isPending: isMutateOrgPending, mutateAsync: createOrgMutate } = useMutation({
+        mutationFn: () => createOrgMutation({
+            name: `${form.getValues().name}'s Organization`,
+            email: user.email ?? "placeholder@email.com",
+        }),
+    });
+    
 
     const [isPending, startAwaitableTransition] = useAwaitableTransition();
 
     const onSubmit = async () => {
         try {
-            await mutateAsync();
+            await updateNameMutate();
+            await createOrgMutate();
 
             await startAwaitableTransition(() => {
                 document.cookie = `${new_user_setup_step_cookie}${user.id}=${currentStep + 1}; path=/`;
                 router.refresh();
             });
 
-            toast.success("Profile setup complete!");
+            toast.success("Perfil configurado e organização criada com sucesso!");
         } catch (error) {
             toast.error(
                 (error as { message?: string })?.message ??
-                    "An error occurred while updating your profile",
+                    "Ocorreu um erro ao atualizar seu perfil",
             );
         }
     };
@@ -90,10 +100,10 @@ export function NewUserProfileForm({
                 <Card className="w-full">
                     <CardHeader>
                         <CardTitle className="text-2xl">
-                            Welcome to {siteConfig.name}
+                            Bem-vindo ao {siteConfig.name}
                         </CardTitle>
                         <CardDescription>
-                            Please set up your profile to get started
+                            Por favor, configure seu perfil para começar
                         </CardDescription>
                     </CardHeader>
 
@@ -106,12 +116,14 @@ export function NewUserProfileForm({
                                     <FormLabel>Name</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="alidotm"
+                                            placeholder="Digite seu nome completo"
                                             {...field}
+                                            aria-label="Nome Completo"
+                                            autoComplete="name"
                                         />
                                     </FormControl>
                                     <FormDescription>
-                                        Enter your full name to get started
+                                        Insira seu nome completo para começar
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -121,10 +133,10 @@ export function NewUserProfileForm({
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                                <Input value={user?.email ?? ""} readOnly />
+                                <Input value={user?.email ?? ""} readOnly disabled/>
                             </FormControl>
                             <FormDescription>
-                                This is the email you used to sign up
+                                Este é o email que você usou para se inscrever
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -132,14 +144,14 @@ export function NewUserProfileForm({
 
                     <CardFooter className="flex items-center justify-end gap-2">
                         <Button
-                            disabled={isPending || isMutatePending}
+                            disabled={isPending || isMutatePending || isMutateOrgPending}
                             type="submit"
                             className="gap-2"
                         >
-                            {isPending || isMutatePending ? (
+                            {isPending || isMutatePending || isMutateOrgPending ? (
                                 <Icons.loader className="h-4 w-4" />
                             ) : null}
-                            <span>Continue</span>
+                            <span>Continuar</span>
                         </Button>
                     </CardFooter>
                 </Card>

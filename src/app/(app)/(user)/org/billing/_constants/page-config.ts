@@ -1,4 +1,4 @@
 export const orgBillingPageConfig = {
-    title: "Billing",
-    description: "Manage your billing settings and subscription.",
+    title: "Assinatura",
+    description: "Gerencie suas configurações de assinatura.",
 } as const;

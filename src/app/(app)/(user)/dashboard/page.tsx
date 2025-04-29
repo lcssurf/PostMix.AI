@@ -654,7 +654,7 @@ export default function DashboardPage() {
 
                   <Button
                     variant="outline"
-                    size="sm"
+                    size="default"
                     onClick={handleGenerateContent}
                     disabled={loadingStates.isGenerating}
                   >
@@ -664,7 +664,7 @@ export default function DashboardPage() {
 
                   <Button
                     variant="destructive"
-                    size="sm"
+                    size="default"
                     onClick={() => {
                       if (confirm("Tem certeza que deseja reiniciar? Você perderá todo o progresso atual.")) {
                         window.location.reload();
