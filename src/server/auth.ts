@@ -7,6 +7,8 @@ import {
 import { type Adapter } from "next-auth/adapters";
 
 import { db } from "@/server/db";
+import { sessions } from "@/server/db/schema";
+
 import { createTable, users } from "@/server/db/schema";
 import { siteUrls } from "@/config/urls";
 
@@ -18,6 +20,8 @@ import GithubProvider from "next-auth/providers/github";
 import { sendVerificationEmail } from "@/server/actions/send-verification-email";
 import { env } from "@/env";
 import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
+import { CustomDrizzleAdapter } from "@/lib/custom-drizzle-adapter";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -130,8 +134,7 @@ export const authOptions: NextAuthOptions = {
             async sendVerificationRequest(params) {
                 return await sendVerificationEmail({ params });
             },
-        })
-        ,
+        }),
         // GoogleProvider({
         //     clientId: env.GOOGLE_CLIENT_ID,
         //     clientSecret: env.GOOGLE_CLIENT_SECRET,
