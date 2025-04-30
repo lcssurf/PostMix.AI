@@ -35,7 +35,7 @@ export function StepNiche({ defaultValue = "", onNext, disabled, loading, comple
         onChange={(e) => setNiche(e.target.value)}
         disabled={disabled}
       />
-      <Button onClick={handleSubmit} disabled={disabled || !niche.trim() || loading || completed}>
+      <Button className="w-full" onClick={handleSubmit} disabled={disabled || !niche.trim() || loading || completed}>
         {loading ? "Carregando..." : completed ? "Concluído" : "Continuar"}
       </Button>
     </div>

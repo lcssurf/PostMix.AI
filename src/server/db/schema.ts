@@ -99,6 +99,10 @@ export const sessions = createTable(
             .notNull()
             .references(() => users.id),
         expires: timestamp("expires", { mode: "date" }).notNull(),
+
+        // Novos campos:
+        ipAddress: varchar("ipAddress", { length: 255 }),
+        userAgent: varchar("userAgent", { length: 512 }),
     },
     (session) => ({
         userIdIdx: index("session_userId_idx").on(session.userId),

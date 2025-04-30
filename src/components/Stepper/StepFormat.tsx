@@ -58,7 +58,7 @@ export function StepFormat({ value, onSelect, disabled, completed, loading }: St
             }, 100); // delay leve para garantir render
           }}
           disabled={disabled || loading || completed}
-          className="mt-4"
+          className="mt-4 w-full"
         >
           {loading ? "Carregando..." : completed ? "Gerando Conteúdo..." : "Finalizar e Gerar"}
         </Button>

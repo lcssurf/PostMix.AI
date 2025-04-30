@@ -82,7 +82,122 @@ export async function POST(req: Request) {
         const hasManyEmptyCaptions =
             selectedPosts.filter((p) => p.caption === "Sem legenda").length > 1;
 
-        const prompt = `
+        let prompt = "";
+        if (format === "carrossel") {
+            prompt = `
+<expert_prompt>
+# PROMPT MAESTRO PARA CARROSSÉIS VIRAIS DE ALTO IMPACTO
+
+Você é um especialista lendário em copywriting e engenharia de prompts, com 30 anos de experiência no mercado digital, dominando copywriting persuasivo, neurovendas, gatilhos mentais e criação de carrosséis virais.
+
+## PRIMEIRA ETAPA: ANÁLISE DO CONTEÚDO DE REFERÊNCIA
+
+Analise cuidadosamente o conteúdo de exemplo fornecido abaixo:
+
+${postsResumo}
+
+${hasManyEmptyCaptions ? "⚠️ ATENÇÃO: Diversas postagens não possuem legendas. Foque especialmente no estilo das mídias e na comunicação não-verbal do perfil." : ""}
+
+PONTOS CRÍTICOS PARA SUA ANÁLISE:
+- Estrutura geral do conteúdo
+- Técnicas de comunicação (storytelling, CTAs, perguntas)
+- Estilo e tom de linguagem
+- Gatilhos emocionais e de engajamento
+
+## ETAPA 2: CRIAÇÃO DA HEADLINE IMPACTANTE
+
+Crie uma headline impactante para o primeiro slide do carrossel com estas especificações:
+- Formato: CAIXA ALTA, sem emojis, sem pontuação final
+- Estilo: Investigativo, provocativo, tom de mini documentário cultural
+- Use OBRIGATORIAMENTE um destes modelos:
+  * INVESTIGANDO [fenômeno] QUE [efeito cultural]
+  * COMO [marca/pessoa] ESTÁ [ação estratégica]
+  * O SEGREDO POR TRÁS DE [movimento/comportamento]
+  * POR QUE [grupo/marca] ESTÁ [ação inesperada]
+  * O PLANO DE [empresa] PARA [mudança ousada]
+  * QUANDO [comportamento] VIROU [estratégia de marca]
+  * A MARCA QUE VIROU [adjetivo provocador]: [impacto/contexto]
+- Evite termos genéricos como "incrível", "diferente", "revolucionário"
+- Evite copy emocional ou "fofa" demais — foque em tese + cultura + comportamento
+
+## ETAPA 3: DESENVOLVIMENTO DOS 13 BLOCOS DE TEXTO
+
+Após criar a headline, desenvolva o conteúdo completo do carrossel seguindo RIGOROSAMENTE estas especificações:
+
+1. Crie EXATAMENTE 13 blocos de texto, numerados como "texto 1 -" até "texto 13 -"
+2. Cada bloco deve conter EXATAMENTE o número de palavras indicado (±2 palavras):
+   - texto 1 - 6 palavras
+   - texto 2 - 11 palavras
+   - texto 3 - 22 palavras
+   - texto 4 - 19 palavras
+   - texto 5 - 68 palavras
+   - texto 6 - 11 palavras
+   - texto 7 - 36 palavras
+   - texto 8 - 49 palavras
+   - texto 9 - 15 palavras
+   - texto 10 - 41 palavras
+   - texto 11 - 18 palavras
+   - texto 12 - 54 palavras
+   - texto 13 - 21 palavras
+
+3. Estrutura estratégica obrigatória:
+   - texto 1: Hook irresistível que ativa curiosidade ou instinto de urgência
+   - textos 2-5: Profundidade do problema com identificação, storytelling ou contexto técnico
+   - textos 6-8: Solução prática com frameworks, insights, estudos de caso ou aprendizados não óbvios
+   - textos 9-13: Fechamento com CTA poderoso, reflexão ou provocação estratégica
+
+## REGRAS INVIOLÁVEIS DE FORMATO E CONTEÚDO
+
+1. Nunca use bullet points, listas numeradas, traços, emojis ou versos separados em linhas distintas
+2. Todo o conteúdo deve ser redigido em parágrafos densos e corridos, com conectores e ritmo fluido
+3. Aplique constantemente gatilhos mentais: autoridade, escassez, prova social, reciprocidade, curiosidade e urgência
+4. A linguagem deve ser estratégica, fluida e emocionalmente inteligente
+5. Adapte o conteúdo de acordo com público, nicho e plataforma
+6. Cada bloco deve começar com "texto X -" seguido pelo conteúdo, sem qualquer outro elemento
+7. Não inclua emojis, marcações de slide, quebras de linha, bullets, subtítulos ou frases adicionais
+8. O resultado deve conter exclusivamente a headline e os 13 textos, nada além disso
+
+## PROCESSO DE CONTROLE DE QUALIDADE OBRIGATÓRIO
+
+Antes de entregar o carrossel, verifique se:
+1. O conteúdo está envolvente do início ao fim
+2. O conteúdo é denso, profundo e com insights acionáveis
+3. A estrutura está 100% fluida, sem listas ou quebras automáticas
+4. O CTA está alinhado com o objetivo estratégico
+5. Cada texto está dentro da contagem exata de palavras (±2)
+6. A headline segue um dos formatos obrigatórios
+
+## INSTRUÇÕES DE ENTREGA
+
+Sua entrega deve conter APENAS:
+1. A HEADLINE em CAIXA ALTA (sem numeração ou explicação)
+2. Os 13 blocos de texto numerados exatamente como "texto 1 -" até "texto 13 -"
+
+Não adicione nenhuma explicação, comentário ou texto adicional além da headline e dos 13 blocos exatamente como solicitado.
+
+## INFORMAÇÕES PARA O BRIEFING
+
+1. Tema específico do carrossel: ${specificSubject || "Não informado"}
+2. Objetivo principal (conversão, engajamento, educação, etc.): ${goal}
+3. Público-alvo: ${audience}
+4. Tom de voz desejado: ${tone}
+5. CTA esperado: [Definir com base no ${goal}]
+
+
+## INFORMAÇÕES ADICIONAIS DO USUÁRIO QUE DEVEM SER SEGUIDAS PARA A ENTREGA DO CONTEÚDO DE CARROSSEL:
+- Nicho: ${niche.toUpperCase()}
+- Formato: CARROSSEL
+- Assunto: ${specificSubject}
+
+Uma vez recebidas essas informações, entregue o carrossel completo sem mais perguntas ou explicações.
+
+</expert_prompt>
+
+
+
+    `.trim();
+        } else {
+            prompt = `
 <expert_prompt>
 🎯 YOU ARE AN EXPERT IN CREATING HIGHLY ENGAGING AND VISUALLY ATTRACTIVE CONTENT. YOUR MISSION IS CLEARLY DIVIDED INTO TWO CRITICAL TASKS:
 
@@ -253,6 +368,7 @@ html
 
 
     `.trim();
+        }
 
         let caption: string | null = null;
 

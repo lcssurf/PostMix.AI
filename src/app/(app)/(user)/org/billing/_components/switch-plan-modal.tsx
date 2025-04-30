@@ -23,6 +23,7 @@ type SwitchPlanModalProps = {
     currencyCode: string;
     planName: string;
     status: string;
+    billingPeriod: "monthly" | "yearly",
 };
 
 export function SwitchPlanModal({
@@ -33,7 +34,8 @@ export function SwitchPlanModal({
     planName,
     price,
     variantId,
-    status
+    status,
+    billingPeriod,
 }: SwitchPlanModalProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     return (
@@ -41,37 +43,42 @@ export function SwitchPlanModal({
             <AlertDialogTrigger asChild>
                 {status === "active" ? (
                     <Button variant="outline" className="w-full">
-                        Switch to {currencySymbol}
-                        {price} {currencyCode} per month
+                        Mudar para {currencySymbol}
+                        {price} /{billingPeriod === "monthly" ? "mês" : "ano"}
                     </Button>
                 ) : (
                     <Button variant="outline" className="w-full">
-                        Subscribe to {currencySymbol}
-                        {price} {currencyCode} per month
+                        Assinar {currencySymbol}
+                        {price} /{billingPeriod === "monthly" ? "mês" : "ano"}
                     </Button>
                 )}
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        Are you sure you want to {status === "active" ? "switch" : "subscribe"} to{" "} {planName} plan?
+                        {status === "active" ? "Confirmar mudança de plano para" : "Confirmar assinatura do plano"} {planName}
                     </AlertDialogTitle>
+
                     <AlertDialogDescription>
                         {status === "active" ? (
                             <p>
-                                You are currently subscribed to a different plan. By switching to the <strong>{planName} plan</strong>, your {cardBrand} card ending in {lastCardDigits} will be charged <strong>{price} {currencyCode}</strong> upon confirmation.
+                                Você já possui uma assinatura ativa. Ao mudar para o plano <strong>{planName}</strong>, utilizaremos seu cartão {cardBrand} final {lastCardDigits}. O novo valor será de <strong>{price} {currencyCode}</strong> por ciclo de cobrança.
                             </p>
                         ) : (
                             <p>
-                                By subscribing to the <strong>{planName} plan</strong>, you will be charged <strong>{price} {currencyCode}</strong> upon confirmation. This will be a recurring charge until you cancel your subscription.
+                                Ao confirmar, sua assinatura no plano <strong>{planName}</strong> será ativada e o valor de <strong>{price} {currencyCode}</strong> será cobrado automaticamente. Você pode cancelar quando quiser.
                             </p>
                         )}
                     </AlertDialogDescription>
+
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <SubscribeBtn variantId={variantId}>{status === "active" ? "Switch" : "Subscribe"}</SubscribeBtn>
+                    <AlertDialogCancel>Voltar</AlertDialogCancel>
+                    <SubscribeBtn variantId={variantId}>
+                        {status === "active" ? "Confirmar mudança" : "Confirmar assinatura"}
+                    </SubscribeBtn>
                 </AlertDialogFooter>
+
             </AlertDialogContent>
         </AlertDialog>
     );

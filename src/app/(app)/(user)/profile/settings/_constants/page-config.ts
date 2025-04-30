@@ -1,5 +1,5 @@
 export const profileSettingsPageConfig = {
-    title: "Profile Settings",
+    title: "Configurações de Perfil",
     description:
-        "Here you can manage all the settings related to your profile, such as your name, profile picture, and more!",
+        "Aqui você pode gerenciar todas as configurações relacionadas ao seu perfil, como seu nome, foto de perfil e mais!",
 } as const;

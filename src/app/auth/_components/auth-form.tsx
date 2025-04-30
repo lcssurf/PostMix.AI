@@ -24,7 +24,7 @@ import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 
 const formSchema = z.object({
-    email: z.string().email("Please enter a valid email address"),
+    email: z.string().email("Por favor, insira um endereço de e-mail válido"),
 });
 
 type formSchemaType = z.infer<typeof formSchema>;
@@ -52,11 +52,11 @@ export function AuthForm({ type }: AuthFormProps) {
                 callbackUrl: siteUrls.dashboard.home,
                 redirect: false,
             });
-            toast.success("Check your email for the magic link", {
-                description: "also check your spam folder if you don't see it.",
+            toast.success("Confira seu e-mail para acessar o link mágico.", {
+                description: "Não se esqueça de verificar a pasta de spam caso não o encontre.",
             });
         } catch (error) {
-            toast.error("An error occurred. Please try again later.");
+            toast.error("Ocorreu um erro. Por favor, tente novamente mais tarde.");
         } finally {
             setIsLoading(false);
         }
@@ -78,8 +78,8 @@ export function AuthForm({ type }: AuthFormProps) {
                     <div className="flex flex-col items-center space-y-1">
                         <h1 className="text-center text-2xl font-medium">
                             {type === "signup"
-                                ? " Create an account"
-                                : "Login to your account"}
+                                ? "Crie uma conta"
+                                : "Faça login na sua conta"}
                         </h1>
                         <Link
                             href={
@@ -90,8 +90,8 @@ export function AuthForm({ type }: AuthFormProps) {
                             className="text-center text-sm text-muted-foreground underline underline-offset-4"
                         >
                             {type === "signup"
-                                ? "Already have an account? Login"
-                                : "Don't have an account? SignUp"}
+                                ? "Já tem uma conta? Faça login"
+                                : "Não tem uma conta? Cadastre-se"}
                         </Link>
                     </div>
                 </div>
@@ -106,13 +106,13 @@ export function AuthForm({ type }: AuthFormProps) {
                                 <FormControl>
                                     <Input
                                         className="bg-background"
-                                        placeholder="hey@example.com"
+                                        placeholder="seuemail@exemplo.com"
                                         {...field}
                                     />
                                 </FormControl>
                                 <FormDescription>
-                                    We&apos;ll never share your email with
-                                    anyone else.
+                                    Nunca compartilharemos seu e-mail com
+                                    ninguém.
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -126,7 +126,7 @@ export function AuthForm({ type }: AuthFormProps) {
                         className="w-full gap-2"
                     >
                         {isLoading && <Icons.loader className="h-4 w-4" />}
-                        <span>Continue with Email</span>
+                        <span>Continuar com Email</span>
                     </Button>
                 </div>
 

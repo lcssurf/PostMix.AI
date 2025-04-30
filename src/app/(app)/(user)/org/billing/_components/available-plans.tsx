@@ -68,9 +68,9 @@ export function AvailablePlans({ subscription }: AvailablePlansProps) {
         <form>
             <Card>
                 <CardHeader>
-                    <CardTitle>Available Plans</CardTitle>
+                    <CardTitle>Planos Disponíveis</CardTitle>
                     <CardDescription>
-                        View available plans and change subscription
+                        Veja os planos disponíveis e altere a assinatura
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -79,9 +79,9 @@ export function AvailablePlans({ subscription }: AvailablePlansProps) {
                             <div className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Billing Cycle</CardTitle>
+                                        <CardTitle>Ciclo de Cobrança</CardTitle>
                                         <CardDescription>
-                                            Choose your billing cycle
+                                            Escolha seu ciclo de cobrança
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -119,7 +119,7 @@ export function AvailablePlans({ subscription }: AvailablePlansProps) {
                                                     })}
                                                     htmlFor="monthly"
                                                 >
-                                                    Monthly
+                                                    Mensal
                                                 </Label>
                                             </div>
                                             <div>
@@ -136,7 +136,7 @@ export function AvailablePlans({ subscription }: AvailablePlansProps) {
                                                     })}
                                                     htmlFor="yearly"
                                                 >
-                                                    Yearly
+                                                    Anual
                                                 </Label>
                                             </div>
                                         </RadioGroup>
@@ -144,9 +144,9 @@ export function AvailablePlans({ subscription }: AvailablePlansProps) {
                                 </Card>
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Plans</CardTitle>
+                                        <CardTitle>Planos</CardTitle>
                                         <CardDescription>
-                                            Choose your plan
+                                            Escolha seu plano
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -189,8 +189,8 @@ export function AvailablePlans({ subscription }: AvailablePlansProps) {
                                                                 }
                                                             </p>
                                                         </div>
-                                                        <div className="font-heading text-lg font-medium">
-                                                            $
+                                                        <div className="flex flex-row gap-1 font-heading text-lg font-medium">
+                                                            <span className="mr-1">R$</span>
                                                             {selectedBilling ===
                                                             "monthly"
                                                                 ? plan.price
@@ -210,7 +210,7 @@ export function AvailablePlans({ subscription }: AvailablePlansProps) {
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="text-lg">
-                                        {selectedPlan?.title} Plan
+                                        Plano {selectedPlan?.title}
                                     </CardTitle>
                                     <CardDescription>
                                         {selectedPlan?.description}
@@ -250,7 +250,7 @@ export function AvailablePlans({ subscription }: AvailablePlansProps) {
                                         variant: "outline",
                                     })}
                                 >
-                                    Current Plan
+                                    Plano Atual
                                 </div>
                             ) : selectedPlan?.id === pricingIds.free ? null : (
                                 <div className="flex w-full flex-col gap-2">
@@ -277,6 +277,7 @@ export function AvailablePlans({ subscription }: AvailablePlansProps) {
                                         }
                                         variantId={selectedVariantId}
                                         status={subscription?.status ?? ""}
+                                        billingPeriod={selectedBilling === "monthly" ? "monthly" : "yearly"}
                                     />
                                 </div>
                             )}

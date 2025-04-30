@@ -55,18 +55,17 @@ export function UserNameForm({ user }: UserNameFormProps) {
         mutationFn: () => updateNameMutation({ name: form.getValues().name }),
         onSuccess: () => {
             router.refresh();
-            toast.success("Name updated successfully");
+            toast.success("Nome atualizado com sucesso");
         },
         onError: (error: { message?: string } = {}) =>
             toast.error(
-                error.message ??
-                    "Failed to update name, please try again later",
+                error.message ?? "Falha ao atualizar o nome, tente novamente mais tarde",
             ),
     });
 
     const onSubmit = async (values: UserNameFormSchema) => {
         if (values.name === user.name) {
-            return toast("Name is already set to this name");
+            return toast("O nome já está definido como este nome");
         }
 
         await mutateAsync();
@@ -78,10 +77,9 @@ export function UserNameForm({ user }: UserNameFormProps) {
                 <Card className="flex h-full w-full flex-col justify-between">
                     <div>
                         <CardHeader>
-                            <CardTitle>Name</CardTitle>
+                            <CardTitle>Nome</CardTitle>
                             <CardDescription>
-                                Please enter your full name, or a display name
-                                you are comfortable with.
+                                Por favor, insira seu nome completo ou um nome de exibição com o qual você se sinta confortável.
                             </CardDescription>
                         </CardHeader>
 
@@ -110,7 +108,7 @@ export function UserNameForm({ user }: UserNameFormProps) {
                             className="gap-2"
                         >
                             {isPending && <Icons.loader className="h-4 w-4" />}
-                            <span>Save Changes</span>
+                            <span>Salvar Alterações</span>
                         </Button>
                     </CardFooter>
                 </Card>

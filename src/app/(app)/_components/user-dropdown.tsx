@@ -75,7 +75,7 @@ function UserDropdownContent({ user, navItems }: UserDropdownContentProps) {
                         <span className="truncate">{user?.email}</span>
                     )}
 
-                    <span className="sr-only">user menu</span>
+                    <span className="sr-only">menu do usuário</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-60" align="start">
@@ -89,7 +89,7 @@ function UserDropdownContent({ user, navItems }: UserDropdownContentProps) {
 
                     <div className="flex w-full flex-col">
                         <p className="truncate text-sm">
-                            {user?.name ?? "Name not found"}
+                            {user?.name ?? "Nome não encontrado"}
                         </p>
                         <p className="w-full truncate text-sm font-light text-muted-foreground">
                             {user?.email}
@@ -123,7 +123,7 @@ function UserDropdownContent({ user, navItems }: UserDropdownContentProps) {
                     <DropdownMenuItem asChild>
                         <button className="flex w-full cursor-pointer items-center gap-2 text-red-500 ">
                             <LogOutIcon className="h-4 w-4" />
-                            <span>Logout</span>
+                            <span>Sair</span>
                         </button>
                     </DropdownMenuItem>
                 </SignoutTrigger>

@@ -31,7 +31,7 @@ type SideNavProps = {
 export async function Sidebar({
     sidebarNavIncludeIds,
     sidebarNavRemoveIds,
-    showOrgSwitcher = true,
+    showOrgSwitcher = false,
     showLogo = true,
 }: SideNavProps) {
     const user = await getUser();
@@ -43,11 +43,11 @@ export async function Sidebar({
 
     const urgOrgsData: UserOrgs[] = [
         {
-            heading: "My Orgs",
+            heading: "Minhas Organizações",
             items: myOrgs,
         },
         {
-            heading: "Shared Orgs",
+            heading: "Organizações Compartilhadas",
             items: sharedOrgs,
         },
     ];

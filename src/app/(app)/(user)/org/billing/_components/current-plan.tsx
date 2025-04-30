@@ -20,16 +20,16 @@ export function CurrentPlan({ subscription }: CurrentPlanProps) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Current Plan</CardTitle>
+                <CardTitle>Plano Atual</CardTitle>
                 <CardDescription>
-                    Manage and view your current plan
+                    Gerencie e visualize seu plano atual
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
                         <p>
-                            <span className="font-semibold">Plan:</span>{" "}
+                            <span className="font-semibold">Plano:</span>{" "}
                             {subscription ? subscription.plan?.title : "Free"}
                         </p>
 
@@ -43,23 +43,23 @@ export function CurrentPlan({ subscription }: CurrentPlanProps) {
                         {subscription ? (
                             <>
                                 {subscription.status === "active" &&
-                                    "Renews at " +
-                                        format(subscription.renews_at, "PP")}
+                                    "Renova em " +
+                                        format(subscription.renews_at, "pp")}
 
                                 {subscription.status === "paused" &&
-                                    "Your subscription is paused"}
+                                    "Sua assinatura está pausada"}
 
                                 {subscription.status === "cancelled" &&
                                     subscription.ends_at &&
                                     `${
                                         new Date(subscription.ends_at) >
                                         new Date()
-                                            ? "Ends at "
-                                            : "Ended on "
-                                    }` + format(subscription.ends_at, "PP")}
+                                            ? "Termina em "
+                                            : "Terminou em "
+                                    }` + format(subscription.ends_at, "pp")}
                             </>
                         ) : (
-                            "No expiration"
+                            "Sem data de expiração"
                         )}
                     </p>
                 </div>
@@ -75,7 +75,7 @@ export function CurrentPlan({ subscription }: CurrentPlanProps) {
                         }}
                     >
                         <Button disabled={!subscription} variant="outline">
-                            Manage your billing settings
+                            Gerencie suas configurações de cobrança
                         </Button>
                     </form>
 

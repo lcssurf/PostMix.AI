@@ -49,7 +49,7 @@ export function StepSpecificSubject({
                 <Button
                     onClick={() => onNext(subject)}
                     disabled={!subject || loading || completed}
-                    className="mt-4"
+                    className="mt-4 w-full"
                 >
                     {loading ? "Carregando..." : completed ? "Concluído" : "Continuar"}
                 </Button>

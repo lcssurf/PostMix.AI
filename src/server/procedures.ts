@@ -7,6 +7,7 @@ import { getUser } from "@/server/auth";
 import { type User } from "next-auth";
 import { usersRoleEnum } from "@/server/db/schema";
 import { z } from "zod";
+import { redirect } from "next/navigation";
 
 const userRoles = z.enum(usersRoleEnum.enumValues);
 
@@ -18,9 +19,12 @@ const userRoles = z.enum(usersRoleEnum.enumValues);
 export const protectedProcedure = async () => {
     const user = await getUser();
 
+    // if (!user) {
+    //     throw new Error("You are not authenticated");
+    // }
     if (!user) {
-        throw new Error("You is not authenticated");
-    }
+        redirect("/login"); // ou use sua URL customizada
+      }
 
     return {
         user: user as User,

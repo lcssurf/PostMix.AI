@@ -27,24 +27,24 @@ export function UserAppearanceForm() {
         <Dialog>
             <Card>
                 <CardHeader>
-                    <CardTitle>Appearance</CardTitle>
+                    <CardTitle>Aparência</CardTitle>
                     <CardDescription>
-                        Customize your app appearance
+                        Personalize a aparência do seu aplicativo
                     </CardDescription>
                 </CardHeader>
                 <CardFooter>
                     <DialogTrigger asChild>
                         <Button className="gap-2">
-                            <span>Personalize</span>
+                            <span>Personalizar</span>
                         </Button>
                     </DialogTrigger>
                 </CardFooter>
             </Card>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Personalize your app appearance</DialogTitle>
+                    <DialogTitle>Personalize a aparência do seu aplicativo</DialogTitle>
                     <DialogDescription>
-                        Choose your app theme, color, and more
+                        Escolha o tema do seu aplicativo
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-wrap items-center gap-4">
