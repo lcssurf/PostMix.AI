@@ -38,6 +38,7 @@ export const env = createEnv({
         DATASET_ID_TIKTOK: z.string(),
         OPENROUTER_API_KEY:z.string(),
         GEMINI_API_KEY: z.string(),
+        LOGIN_COOKIE_SECRET: z.string(),
     },
 
     /**
@@ -83,6 +84,8 @@ export const env = createEnv({
         OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
 
         GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+
+        LOGIN_COOKIE_SECRET: process.env.LOGIN_COOKIE_SECRET,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

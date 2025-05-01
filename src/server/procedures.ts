@@ -19,12 +19,14 @@ const userRoles = z.enum(usersRoleEnum.enumValues);
 export const protectedProcedure = async () => {
     const user = await getUser();
 
-    // if (!user) {
-    //     throw new Error("You are not authenticated");
-    // }
+    console.log("User", user);
+    
     if (!user) {
-        redirect("/login"); // ou use sua URL customizada
-      }
+        throw new Error("You are not authenticated");
+    }
+    // if (!user) {
+    //     redirect("/login"); // ou use sua URL customizada
+    //   }
 
     return {
         user: user as User,
