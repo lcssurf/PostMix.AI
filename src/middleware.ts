@@ -6,6 +6,39 @@ import { getAbsoluteUrl } from "@/lib/utils";
 import { env } from "@/env";
 
 export async function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl;
+
+    // 🔐 Captura IP e User-Agent durante o callback de login
+    if (pathname.startsWith("/api/auth/callback")) {
+
+        
+        const ip =
+            request.ip ??
+            request.headers.get("x-forwarded-for") ??
+            "ip_not_found";
+        const userAgent = request.headers.get("user-agent") ?? "ua_not_found";
+
+
+        const response = NextResponse.next();
+        response.cookies.set("client-ip", ip, {
+            httpOnly: false, // precisa ser false para ser lido por headers().get("cookie")
+            secure: true,
+            sameSite: "lax",
+            path: "/",
+            maxAge: 300, // 5 minutos
+        });
+
+        response.cookies.set("client-ua", userAgent, {
+            httpOnly: false,
+            secure: true,
+            sameSite: "lax",
+            path: "/",
+            maxAge: 300,
+        });
+
+        return response;
+    }
+
     const isAdminPath = request.nextUrl.pathname.startsWith("/admin");
 
     /** check if application setting is on or off */
@@ -68,5 +101,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         "/((?!api|assets|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+        "/api/auth/callback/email", // 👈 incluir explicitamente
     ],
+    runtime: "nodejs",
 };

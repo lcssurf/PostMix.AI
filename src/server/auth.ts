@@ -7,7 +7,7 @@ import {
 import { type Adapter } from "next-auth/adapters";
 
 import { db } from "@/server/db";
-import { sessions } from "@/server/db/schema";
+import { logins } from "@/server/db/schema";
 
 import { createTable, users } from "@/server/db/schema";
 import { siteUrls } from "@/config/urls";
@@ -21,7 +21,9 @@ import { sendVerificationEmail } from "@/server/actions/send-verification-email"
 import { env } from "@/env";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { CustomDrizzleAdapter } from "@/lib/custom-drizzle-adapter";
+import { cookies as nextCookies } from "next/headers";
+
+import { parse } from "cookie";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -50,6 +52,9 @@ declare module "next-auth" {
         emailVerified: Date | null;
         isNewUser: boolean;
         // ...other properties
+    }
+    interface EventCallbacks {
+        createSession?: (message: { session: any }) => Promise<void>;
     }
 }
 
@@ -121,6 +126,7 @@ export const authOptions: NextAuthOptions = {
     secret: env.NEXTAUTH_SECRET,
     session: {
         strategy: "jwt",
+        maxAge: 7 * 24 * 60 * 60, // 7 dias
     },
     adapter: DrizzleAdapter(db, createTable) as Adapter,
     pages: {
@@ -153,6 +159,37 @@ export const authOptions: NextAuthOptions = {
          * @see https://next-auth.js.org/providers/github
          */
     ],
+    events: {
+        async signIn({ user }) {
+            const cookieStore = nextCookies();
+            
+            let ip = cookieStore.get("client-ip")?.value ?? null;
+            let userAgent = cookieStore.get("client-ua")?.value ?? null;
+
+            // Retry logic to ensure cookies are available
+            let retries = 3;
+            while ((!ip || !userAgent) && retries > 0) {
+            console.log("[NESTAUTH - signIn] Retrying to fetch cookies...");
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
+            ip = cookieStore.get("client-ip")?.value ?? null;
+            userAgent = cookieStore.get("client-ua")?.value ?? null;
+            retries--;
+            }
+
+            const device = userAgent?.includes("Mobile") ? "mobile" : "desktop";
+
+            console.log("[NESTAUTH - signIn] Cookies read:", { ip, userAgent, device });
+
+            await db.insert(logins).values({
+            userId: user.id,
+            ipAddress: ip,
+            userAgent,
+            device,
+            });
+
+            console.log("[signIn] Login saved successfully");
+        },
+    },
 };
 
 /**
@@ -171,3 +208,7 @@ export const getUser = async () => {
     const session = await getServerAuthSession();
     return session?.user ?? null;
 };
+function cookies() {
+    throw new Error("Function not implemented.");
+}
+

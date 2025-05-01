@@ -20,6 +20,26 @@ import { StepSpecificSubject } from "@/components/Stepper/StepSpecificSubject";
 
 export default function DashboardPage() {
 
+  useEffect(() => {
+    const stored = sessionStorage.getItem("login-logged");
+  
+    const expired =
+      stored && Date.now() - Number(stored) > 12 * 60 * 60 * 1000; // 12 hours
+  
+    if (!stored || expired) {
+      fetch("/api/log-login", { method: "POST" })
+        .then((res) => {
+          if (res.ok) {
+            sessionStorage.setItem("login-logged", Date.now().toString());
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to log login:", err);
+        });
+    }
+  }, []);
+  
+
   const [loadingStates, setLoadingStates] = useState({
     isLoadingProfile: false,
     isLoadingPosts: false,
@@ -592,7 +612,7 @@ export default function DashboardPage() {
                   setTimeout(() => {
                     generateButtonRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
                   }, 300);
-                  
+
 
                   // 🔽 Log dos dados finais preenchidos
                   // console.log("🧠 Dados finalizados para geração:");

@@ -15,6 +15,13 @@
       "when": 1745969174513,
       "tag": "0001_colorful_black_crow",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1746049806429,
+      "tag": "0002_wise_toxin",
+      "breakpoints": true
     }
   ]
 }

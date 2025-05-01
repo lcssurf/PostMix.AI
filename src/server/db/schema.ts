@@ -27,6 +27,19 @@ export const createTable = pgTableCreator(
 
 export const usersRoleEnum = pgEnum("role", ["User", "Admin", "Super Admin"]);
 
+export const logins = createTable("login", {
+    id: varchar("id", { length: 255 }).primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("userId", { length: 255 }).notNull().references(() => users.id),
+    ipAddress: varchar("ipAddress", { length: 255 }),
+    userAgent: varchar("userAgent", { length: 512 }),
+    device: varchar("device", { length: 64 }),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const loginsRelations = relations(logins, ({ one }) => ({
+    user: one(users, { fields: [logins.userId], references: [users.id] }),
+}));
+
 export const users = createTable("user", {
     id: varchar("id", { length: 255 }).notNull().primaryKey(),
     name: varchar("name", { length: 255 }),
