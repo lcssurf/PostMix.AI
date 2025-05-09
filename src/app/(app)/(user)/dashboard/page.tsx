@@ -182,7 +182,7 @@ export default function DashboardPage() {
 
 
       if (!Array.isArray(posts)) {
-        throw new Error("Erro ao buscar posts do perfil.");
+        throw new Error("Não conseguimos carregar os posts no momento. O perfil pode ser privado ou ocorreu um problema temporário.");
       }
 
       if (posts.length === 0) {
@@ -208,7 +208,7 @@ export default function DashboardPage() {
         _cachedAt: Date.now(),
       };
 
-      sessionStorage.setItem(cacheKey, JSON.stringify(payload));
+      localStorage.setItem(cacheKey, JSON.stringify(payload));
 
       setReferenceProfile(profile);
       setReferencePosts(posts);
