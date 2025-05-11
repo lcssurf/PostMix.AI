@@ -1,37 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get("code");
-  const uri = process.env.NEXTAUTH_URL!;
+  const url = new URL(req.url);
+  const code = url.searchParams.get("code");
+  const state = url.searchParams.get("state");
+
+  const storedState = req.cookies.get("canva_oauth_state")?.value;
+  const codeVerifier = req.cookies.get("canva_oauth_code_verifier")?.value;
+
+  if (!code || !state || state !== storedState || !codeVerifier) {
+    return NextResponse.json({ error: "Invalid OAuth callback." }, { status: 400 });
+  }
 
   const tokenRes = await fetch("https://api.canva.com/auth/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       grant_type: "authorization_code",
-      code: code ?? "",
+      code,
+      redirect_uri: `${process.env.NEXTAUTH_URL}/api/canva/callback`,
       client_id: process.env.CANVA_CLIENT_ID!,
-      client_secret: process.env.CANVA_CLIENT_SECRET!,
-      redirect_uri: `${uri}/api/canva/callback`
-    }).toString()
+      code_verifier: codeVerifier,
+    }).toString(),
   });
 
   const token = await tokenRes.json();
 
   if (!token.access_token) {
-    return NextResponse.json({ error: "Erro ao conectar com Canva" }, { status: 400 });
+    return NextResponse.json({ error: "Token exchange failed", details: token }, { status: 500 });
   }
 
-  const response = NextResponse.redirect(`${uri}/dashboard?canva_connected=true`);
-
-  // ⚠️ Apenas para testes — ideal é salvar via session/jwt/db
-  response.cookies.set("canva_token", token.access_token, {
-    path: "/",
+  // ✅ Salva o token como cookie
+  const res = NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard?canva_connected=true`);
+  res.cookies.set("canva_token", token.access_token, {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
-    maxAge:  7 * 24 * 60 * 60, // 7 dias
+    path: "/",
+    maxAge: token.expires_in ?? 3600,
   });
 
-  return response;
+  return res;
 }

@@ -700,7 +700,7 @@ useEffect(() => {
                       Gerar no Canva
                       </Button>
                     ) : (
-                      <a href="/api/auth/canva" target="_blank" rel="noopener noreferrer">
+                      <a href="/api/canva/authorize" target="_blank" rel="noopener noreferrer">
                       Conectar ao Canva
                       </a>
                     )}
