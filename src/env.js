@@ -39,6 +39,9 @@ export const env = createEnv({
         OPENROUTER_API_KEY:z.string(),
         GEMINI_API_KEY: z.string(),
         LOGIN_COOKIE_SECRET: z.string(),
+        CANVA_CLIENT_ID: z.string(),
+        CANVA_CLIENT_SECRET: z.string(),
+        CANVA_TEMPLATE_ID: z.string(),
     },
 
     /**
@@ -86,6 +89,10 @@ export const env = createEnv({
         GEMINI_API_KEY: process.env.GEMINI_API_KEY,
 
         LOGIN_COOKIE_SECRET: process.env.LOGIN_COOKIE_SECRET,
+
+        CANVA_CLIENT_ID: process.env.CANVA_CLIENT_ID,
+        CANVA_CLIENT_SECRET: process.env.CANVA_CLIENT_SECRET,
+        CANVA_TEMPLATE_ID: process.env.CANVA_TEMPLATE_ID,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

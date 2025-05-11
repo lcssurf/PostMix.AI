@@ -19,6 +19,16 @@ import { StepSpecificSubject } from "@/components/Stepper/StepSpecificSubject";
 
 
 export default function DashboardPage() {
+const [connected, setConnected] = useState<boolean | null>(null);
+
+useEffect(() => {
+  fetch("/api/canva/status")
+    .then(res => res.json())
+    .then(data => setConnected(data.connected))
+    .catch(() => setConnected(false));
+}, []);
+
+
 
   useEffect(() => {
     const stored = sessionStorage.getItem("login-logged");
@@ -671,6 +681,30 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
                 <div className="flex gap-2">
+
+                    <Button>
+                    {connected === null ? (
+                      "Verificando conexão..."
+                    ) : connected ? (
+                      <Button
+                      onClick={async () => {
+                        const res = await fetch("/api/canva/generate", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ conteudo: generatedContent })
+                        });
+                        const data = await res.json();
+                        window.open(data.url, "_blank");
+                      }}
+                      >
+                      Gerar no Canva
+                      </Button>
+                    ) : (
+                      <a href="/api/auth/canva" target="_blank" rel="noopener noreferrer">
+                      Conectar ao Canva
+                      </a>
+                    )}
+                    </Button>
 
                   <Button
                     variant="outline"
