@@ -1,3 +1,4 @@
+import { saveGeneratedContentMutation } from "@/server/actions/user/mutations";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -400,6 +401,29 @@ html
         }
 
         console.log("✅ Conteúdo gerado:", caption);
+
+        try {
+            await saveGeneratedContentMutation({
+                contentType: format as
+                    | "carrossel"
+                    | "legenda"
+                    | "reels"
+                    | "tiktok"
+                    | "whatsapp",
+                content: {
+                    title: "PostMix - Geração de Conteúdo",
+                    text: caption,
+                },
+            });
+        } catch (error) {
+            console.error("⚠️ Erro ao salvar conteúdo gerado:", error);
+            return NextResponse.json(
+                { error: "Erro ao salvar conteúdo gerado." },
+                { status: 500 },
+            );
+        }
+        console.log("✅ Conteúdo salvo no DB com sucesso.");
+        
 
         return NextResponse.json({
             content: [

@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
-import { createPreset } from "fumadocs-ui/tailwind-plugin";
+// import { createPreset } from "fumadocs-ui/tailwind-plugin";
 
 const config = {
     darkMode: ["class"],
@@ -9,7 +9,7 @@ const config = {
         "./node_modules/fumadocs-ui/dist/**/*.js",
         "./mdx-components.tsx",
     ],
-    presets: [createPreset()],
+    // presets: [createPreset()],
     prefix: "",
     safelist: ["dark"],
     theme: {

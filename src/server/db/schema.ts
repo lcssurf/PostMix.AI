@@ -27,9 +27,41 @@ export const createTable = pgTableCreator(
 
 export const usersRoleEnum = pgEnum("role", ["User", "Admin", "Super Admin"]);
 
+export const contentTypeEnum = pgEnum("content_type", [
+    "legenda",
+    "reels",
+    "carrossel",
+    "tiktok",
+    "whatsapp",
+]);
+export const generatedContents = createTable("generatedContents", {
+    id: varchar("id", { length: 255 })
+        .primaryKey()
+        .default(sql`gen_random_uuid()`),
+    userId: varchar("userId", { length: 255 })
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    contentType: contentTypeEnum("contentType").notNull(),
+    content: jsonb("content").notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+});
+export const generatedContentsRelations = relations(
+    generatedContents,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [generatedContents.userId],
+            references: [users.id],
+        }),
+    }),
+);
+
 export const logins = createTable("login", {
-    id: varchar("id", { length: 255 }).primaryKey().default(sql`gen_random_uuid()`),
-    userId: varchar("userId", { length: 255 }).notNull().references(() => users.id),
+    id: varchar("id", { length: 255 })
+        .primaryKey()
+        .default(sql`gen_random_uuid()`),
+    userId: varchar("userId", { length: 255 })
+        .notNull()
+        .references(() => users.id),
     ipAddress: varchar("ipAddress", { length: 255 }),
     userAgent: varchar("userAgent", { length: 512 }),
     device: varchar("device", { length: 64 }),
@@ -51,6 +83,14 @@ export const users = createTable("user", {
     role: usersRoleEnum("role").default("User").notNull(),
     isNewUser: boolean("isNewUser").default(true).notNull(),
     createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+    canvaState: varchar("canvaState"),
+    canvaCodeVerifier: varchar("canvaCodeVerifier"),
+    canvaAccessToken: varchar("canvaAccessToken"),
+    canvaRefreshToken: varchar("canvaRefreshToken"),
+    canvaTokenExpiresAt: timestamp("canvaTokenExpiresAt", {
+        mode: "date",
+    }),
+    updatedAt: timestamp("updatedAt", { mode: "date" }),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

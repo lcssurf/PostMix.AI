@@ -42,6 +42,7 @@ export const env = createEnv({
         CANVA_CLIENT_ID: z.string(),
         CANVA_CLIENT_SECRET: z.string(),
         CANVA_TEMPLATE_ID: z.string(),
+        CANVA_REDIRECT_URI: z.string().url(),
     },
 
     /**
@@ -93,6 +94,7 @@ export const env = createEnv({
         CANVA_CLIENT_ID: process.env.CANVA_CLIENT_ID,
         CANVA_CLIENT_SECRET: process.env.CANVA_CLIENT_SECRET,
         CANVA_TEMPLATE_ID: process.env.CANVA_TEMPLATE_ID,
+        CANVA_REDIRECT_URI: process.env.CANVA_REDIRECT_URI,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

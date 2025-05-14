@@ -1,9 +1,186 @@
 "use server";
 import { db } from "@/server/db";
-import { accounts, userInsertSchema, users } from "@/server/db/schema";
+import {
+    accounts,
+    contentTypeEnum,
+    generatedContents,
+    userInsertSchema,
+    users,
+} from "@/server/db/schema";
 import { protectedProcedure, superAdminProcedure } from "@/server/procedures";
 import { eq } from "drizzle-orm";
 import type { z } from "zod";
+import { z as zod } from "zod";
+
+/**
+ * Get the generated content by id
+ * @param id The id of the content
+ */
+const getGeneratedContentByIdSchema = zod.object({
+    id: zod.string(),
+});
+type GetGeneratedContentByIdProps = z.infer<
+    typeof getGeneratedContentByIdSchema
+>;
+export async function getGeneratedContentById(
+    input: GetGeneratedContentByIdProps,
+) {
+    const parsed = await getGeneratedContentByIdSchema.safeParseAsync(input);
+
+    if (!parsed.success) {
+        throw new Error("Invalid content id", {
+            cause: parsed.error.errors,
+        });
+    }
+
+    const result = await db
+        .select({ content: generatedContents.content })
+        .from(generatedContents)
+        .where(eq(generatedContents.id, parsed.data.id))
+        .limit(1);
+
+    if (!result.length) {
+        throw new Error("Content not found");
+    }
+
+    return result[0];
+}
+
+/**
+ * Insert generated content for the authenticated user
+ * @param contentType The type of content
+ * @param content The content data
+ */
+const insertGeneratedContentSchema = zod.object({
+    contentType: zod.enum(contentTypeEnum.enumValues), // use the correct property for enum values
+    content: zod.record(zod.any()),
+});
+type InsertGeneratedContentProps = z.infer<typeof insertGeneratedContentSchema>;
+
+export async function saveGeneratedContentMutation(
+    input: InsertGeneratedContentProps,
+) {
+    const { user } = await protectedProcedure();
+
+    const parsed = await insertGeneratedContentSchema.safeParseAsync(input);
+
+    if (!parsed.success) {
+        throw new Error("Invalid content data", {
+            cause: parsed.error.errors,
+        });
+    }
+
+    return await db
+        .insert(generatedContents)
+        .values({
+            userId: user.id,
+            contentType: parsed.data.contentType,
+            content: parsed.data.content,
+        })
+        .returning(); // se quiser retornar o id ou dados inseridos
+}
+
+/**
+ * Update the canvaState and canvaCodeVerifier of the user
+ * @param canvaState The new state
+ * @param canvaCodeVerifier The new codeVerifier
+ */
+
+const updateStateAndCodeVerifierSchema = userInsertSchema.pick({
+    canvaState: true,
+    canvaCodeVerifier: true,
+});
+
+type UpdateStateAndCodeVerifierProps = z.infer<
+    typeof updateStateAndCodeVerifierSchema
+>;
+
+export async function updateStateAndCodeVerifierMutation({
+    canvaState,
+    canvaCodeVerifier,
+}: UpdateStateAndCodeVerifierProps) {
+    const { user } = await protectedProcedure();
+
+    const parsed = await updateStateAndCodeVerifierSchema.safeParseAsync({
+        canvaState,
+        canvaCodeVerifier,
+    });
+
+    if (!parsed.success) {
+        throw new Error("Invalid canvaState or canvaCodeVerifier", {
+            cause: parsed.error.errors,
+        });
+    }
+
+    return await db
+        .update(users)
+        .set({
+            canvaState: parsed.data.canvaState,
+            canvaCodeVerifier: parsed.data.canvaCodeVerifier,
+        })
+        .where(eq(users.id, user.id))
+        .execute();
+}
+
+/**
+ * Get the stored Canva state and code_verifier for the authenticated user.
+ */
+export async function getCanvaAuthSessionData() {
+    const { user } = await protectedProcedure();
+
+    const result = await db
+        .select({
+            canvaState: users.canvaState,
+            canvaCodeVerifier: users.canvaCodeVerifier,
+            canvaAccessToken: users.canvaAccessToken,
+            canvaRefreshToken: users.canvaRefreshToken,
+            canvaTokenExpiresAt: users.canvaTokenExpiresAt,
+        })
+        .from(users)
+        .where(eq(users.id, user.id))
+        .limit(1);
+
+    if (
+        !result.length ||
+        !result[0]?.canvaState ||
+        !result[0]?.canvaCodeVerifier
+    ) {
+        throw new Error("No Canva session data found for the user.");
+    }
+
+    return {
+        canvaState: result[0].canvaState,
+        canvaCodeVerifier: result[0].canvaCodeVerifier,
+        canvaAccessToken: result[0].canvaAccessToken,
+        canvaRefreshToken: result[0].canvaRefreshToken,
+        canvaTokenExpiresAt: result[0].canvaTokenExpiresAt,
+    };
+}
+
+/**
+ * Save Canva tokens for the authenticated user
+ * @param tokenData The token data to save
+ */
+export async function saveCanvaTokensMutation(tokenData: {
+    access_token: string;
+    refresh_token: string;
+    expires_in: number; // segundos até expirar
+}) {
+    const { user } = await protectedProcedure();
+
+    const expiresAt = new Date(Date.now() + tokenData.expires_in * 1000);
+
+    return await db
+        .update(users)
+        .set({
+            canvaAccessToken: tokenData.access_token,
+            canvaRefreshToken: tokenData.refresh_token,
+            canvaTokenExpiresAt: expiresAt,
+            updatedAt: new Date(),
+        })
+        .where(eq(users.id, user.id))
+        .execute();
+}
 
 /**
  * Update the name of the user

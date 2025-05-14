@@ -19,23 +19,33 @@ import { StepSpecificSubject } from "@/components/Stepper/StepSpecificSubject";
 
 
 export default function DashboardPage() {
-const [connected, setConnected] = useState<boolean | null>(null);
+  const [connected, setConnected] = useState<boolean | null>(null);
 
-useEffect(() => {
-  fetch("/api/canva/status")
-    .then(res => res.json())
-    .then(data => setConnected(data.connected))
-    .catch(() => setConnected(false));
-}, []);
+  // useEffect(() => {
+  //   const checkCanvaConnection = async () => {
+  //     try {
+  //       console.log("🚀 Verificando conexão com o Canva...");
+  //       const res = await fetch("/api/canva/status");
+  //       const data = await res.json();
+  //       setConnected(data.status === 'connected' ? true : false);
+  //       console.log("🔗 Status do Canva:", data.status === 'connected' ? "Conectado" : "Desconectado");
+  //     } catch (error) {
+  //       console.error("❌ Erro ao verificar conexão com o Canva:", error);
+  //       setConnected(null);
+  //     }
+  //   };
+
+  //   checkCanvaConnection();
+  // }, []);
 
 
 
   useEffect(() => {
     const stored = sessionStorage.getItem("login-logged");
-  
+
     const expired =
       stored && Date.now() - Number(stored) > 12 * 60 * 60 * 1000; // 12 hours
-  
+
     if (!stored || expired) {
       fetch("/api/log-login", { method: "POST" })
         .then((res) => {
@@ -48,7 +58,7 @@ useEffect(() => {
         });
     }
   }, []);
-  
+
 
   const [loadingStates, setLoadingStates] = useState({
     isLoadingProfile: false,
@@ -511,6 +521,8 @@ useEffect(() => {
 
       <div className="flex flex-col md:flex-row gap-8 mt-6">
 
+
+
         {/* Barra lateral com sticky */}
         <div className="relative">
           <div className="sticky top-20">
@@ -522,6 +534,50 @@ useEffect(() => {
         <div className="flex-1 space-y-6">
 
           <div ref={stepRefs[0]}>
+
+            {/* <div className="flex justify-end pb-2">
+              {connected === null ? (
+                <Button disabled>
+                  <img
+
+                    src="/CanvaLogo.svg"
+                    alt="Canva Logo"
+                    className="w-6 h-6 mr-2"
+                  />
+                  Verificando conexão...
+                </Button>
+              ) : connected ? (
+                <div className="flex items-center gap-2">
+
+                  <Button
+                    disabled
+                  >
+                    <img
+
+                      src="/CanvaLogo.svg"
+                      alt="Canva Logo"
+                      className="w-6 h-6 mr-2"
+                    />
+                    Você está conectado ao Canva
+                  </Button>
+                </div>
+              ) : (
+                <a href="/api/canva/authorize" target="_blank" rel="noopener noreferrer">
+                  <div className="flex items-center gap-2">
+
+                    <Button>
+                      <img
+                        src="/CanvaLogo.svg"
+                        alt="Canva Logo"
+                        className="w-6 h-6 mr-2"
+                      />
+                      Conectar ao Canva
+                    </Button>
+                  </div>
+                </a>
+              )}
+            </div> */}
+
             <StepProfileInput
               onSubmit={({ competitor }) => {
 
@@ -682,29 +738,51 @@ useEffect(() => {
                 <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
                 <div className="flex gap-2">
 
-                    <Button>
-                    {connected === null ? (
-                      "Verificando conexão..."
-                    ) : connected ? (
-                      <Button
+                  {/* {connected === null ? (
+                    <Button disabled>
+
+                      <img
+
+                        src="/CanvaLogo.svg"
+                        alt="Canva Logo"
+                        className="w-6 h-6"
+                      />
+                      Verificando conexão...
+                    </Button>
+                  ) : connected ? (
+                    <Button
                       onClick={async () => {
                         const res = await fetch("/api/canva/generate", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ conteudo: generatedContent })
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ conteudo: generatedContent }),
                         });
                         const data = await res.json();
                         window.open(data.url, "_blank");
                       }}
-                      >
+                    >
+                      <img
+
+                        src="/CanvaLogo.svg"
+                        alt="Canva Logo"
+                        className="w-6 h-6 mr-2"
+                      />
                       Gerar no Canva
-                      </Button>
-                    ) : (
-                      <a href="/api/canva/authorize" target="_blank" rel="noopener noreferrer">
-                      Conectar ao Canva
-                      </a>
-                    )}
                     </Button>
+                  ) : (
+                    <a href="/api/canva/authorize" target="_blank" rel="noopener noreferrer">
+                      <Button>
+                        <img
+
+                          src="/CanvaLogo.svg"
+                          alt="Canva Logo"
+                          className="w-6 h-6"
+                        />
+                        Conectar ao Canva
+                      </Button>
+                    </a>
+                  )} */}
+
 
                   <Button
                     variant="outline"
