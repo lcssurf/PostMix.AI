@@ -1,3 +1,4 @@
+import { extractTextsFromRawContent } from "@/lib/content-normalize";
 import { saveGeneratedContentMutation } from "@/server/actions/user/mutations";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
@@ -402,6 +403,8 @@ html
 
         console.log("✅ Conteúdo gerado:", caption);
 
+        const content = extractTextsFromRawContent(caption);
+
         try {
             await saveGeneratedContentMutation({
                 contentType: format as
@@ -412,7 +415,7 @@ html
                     | "whatsapp",
                 content: {
                     title: "PostMix - Geração de Conteúdo",
-                    text: caption,
+                    text: content.texts,
                 },
             });
         } catch (error) {
