@@ -125,18 +125,24 @@ export default function FigmaPluginPage() {
                 </section>
 
 
-               {/* Passo 5 */}
-<section className="space-y-4">
-  <h2 className="text-2xl font-semibold">5. Tudo pronto!</h2>
-  <p>
-    O conteúdo foi importado com sucesso no seu arquivo do Figma. Agora é só ajustar, exportar ou
-    publicar como preferir.
-  </p>
-  <p className="text-muted-foreground text-sm">
-    Obrigado por usar o plugin do PostMix.AI! Se tiver dúvidas, sugestões ou precisar de ajuda,
-    estamos à disposição via suporte.
-  </p>
-</section>
+                {/* Passo 5 */}
+                <section className="space-y-4">
+                    <h2 className="text-2xl font-semibold">5. Tudo pronto!</h2>
+                    <p>
+                        O conteúdo foi importado com sucesso no seu arquivo do Figma. Agora é só ajustar, exportar ou
+                        publicar como preferir.
+                    </p>
+
+                    <div className="relative w-full aspect-[16/9] rounded-md overflow-hidden border">
+                        <video controls className="object-contain" muted autoPlay loop>
+                            <source src="/figma-plugin/figma.mp4" type="video/mp4" />
+                        </video>
+                    </div>
+                    <p className="text-muted-foreground text-sm">
+                        Obrigado por usar o plugin do PostMix.AI! Se tiver dúvidas, sugestões ou precisar de ajuda,
+                        estamos à disposição via suporte.
+                    </p>
+                </section>
 
 
             </article>

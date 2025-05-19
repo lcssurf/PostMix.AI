@@ -20,6 +20,7 @@ export const siteUrls = {
     maintenance: "/maintenance",
     waitlist: "/waitlist",
     rapidlaunch: "https://www.rapidlaunch.xyz",
+    figma: "/figma",
 
     dashboard: {
         home: "/dashboard",
@@ -54,6 +55,7 @@ export const siteUrls = {
 } as const;
 
 export const publicRoutes: string[] = [
+    siteUrls.figma,
     siteUrls.publicUrl,
     siteUrls.home,
     siteUrls.pricing,
@@ -69,6 +71,7 @@ export const publicRoutes: string[] = [
 
 export const protectedRoutes: string[] = [
     siteUrls.dashboard.home,
+    siteUrls.dashboard.history,
     siteUrls.feedback,
     siteUrls.organization.members.home,
     siteUrls.organization.members.invite,

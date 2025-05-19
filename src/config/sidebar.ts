@@ -12,7 +12,9 @@ import {
     UserRoundCheckIcon,
     UserRoundPlusIcon,
     UsersRoundIcon,
-    HistoryIcon
+    HistoryIcon,
+    FigmaIcon,
+    BlocksIcon,
 } from "lucide-react";
 import { siteUrls } from "@/config/urls";
 
@@ -128,6 +130,25 @@ const navigation: SidebarNavItems[] = [
                 icon: HistoryIcon,
                 href: siteUrls.dashboard.history,
             },
+            {
+                label: "Figma",
+                icon: FigmaIcon,
+                subMenu: [
+                    {
+                        label: "Plugin",
+                        icon: BlocksIcon,
+                        href: 'https://www.figma.com/community/plugin/1504501310632077296/postmix-ai-plugin',
+                        external: true,
+                    },
+                    {
+                        label: "Como Usar",
+                        icon: BookTextIcon,
+                        href: 'https://postmix.zanapp.com.br/figma',
+                        external: true,
+                    },
+                ]
+            },
+
 
         ],
     },
