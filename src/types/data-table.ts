@@ -24,3 +24,10 @@ export interface DataTableFilterableColumn<TData> {
     title: string;
     options: Option[];
 }
+
+export interface DataTableHistoryData {
+  id: string;
+  createdAt: string;
+  contentType: "carrossel" | "reels" | "post" | "legenda";
+  content: JSON;
+};

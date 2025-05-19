@@ -8,9 +8,11 @@ import {
     users,
 } from "@/server/db/schema";
 import { protectedProcedure, superAdminProcedure } from "@/server/procedures";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import type { z } from "zod";
 import { z as zod } from "zod";
+
+
 
 /**
  * Get the generated content by id
@@ -45,6 +47,8 @@ export async function getGeneratedContentById(
 
     return result[0];
 }
+
+
 
 /**
  * Insert generated content for the authenticated user

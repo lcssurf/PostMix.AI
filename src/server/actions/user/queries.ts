@@ -1,12 +1,34 @@
 import "server-only";
 
 import { db } from "@/server/db";
-import { users } from "@/server/db/schema";
-import { adminProcedure } from "@/server/procedures";
-import { asc, count, desc, gt, ilike, inArray, or } from "drizzle-orm";
+import { generatedContents, users } from "@/server/db/schema";
+import { adminProcedure, protectedProcedure } from "@/server/procedures";
+import { asc, count, desc, eq, gt, ilike, inArray, or } from "drizzle-orm";
 import { unstable_noStore as noStore } from "next/cache";
 import { z } from "zod";
 import { eachMonthOfInterval, format, startOfMonth, subMonths } from "date-fns";
+
+
+
+/**
+ * @returns all generated content by the user
+ */
+export async function getGeneratedContent() {
+
+    const { user } = await protectedProcedure();
+
+    const result = await db
+        .select()
+        .from(generatedContents)
+        .where(eq(generatedContents.userId, user.id))
+        .orderBy(desc(generatedContents.createdAt));
+
+    if (!result.length) {
+        throw new Error("Content not found");
+    }
+
+    return result;
+}
 
 /**
  * Get paginated users

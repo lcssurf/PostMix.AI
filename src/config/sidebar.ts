@@ -12,6 +12,7 @@ import {
     UserRoundCheckIcon,
     UserRoundPlusIcon,
     UsersRoundIcon,
+    HistoryIcon
 } from "lucide-react";
 import { siteUrls } from "@/config/urls";
 
@@ -122,6 +123,12 @@ const navigation: SidebarNavItems[] = [
                 icon: LayoutDashboardIcon,
                 href: siteUrls.dashboard.home,
             },
+            {
+                label: "Histórico",
+                icon: HistoryIcon,
+                href: siteUrls.dashboard.history,
+            },
+
         ],
     },
     // {
