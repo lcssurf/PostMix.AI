@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 const schema = z.object({
-  competitor: z.string().min(2),
+  competitor: z.string().min(2).or(z.literal("")),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -20,9 +20,10 @@ type Props = {
   loading?: boolean;
   error?: string;
   completed?: boolean; // Prop to indicate if this step is already completed
+  skipStep?: () => void; // Optional prop to skip the step
 };
 
-export function StepProfileInput({ onSubmit, disabled, loading, error, completed }: Props) {
+export function StepProfileInput({ onSubmit, disabled, loading, error, completed, skipStep }: Props) {
   const {
     register,
     handleSubmit,
@@ -48,6 +49,15 @@ export function StepProfileInput({ onSubmit, disabled, loading, error, completed
         />
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
+        <Button
+          variant="secondary"
+          className="w-full"
+          onClick={skipStep ? skipStep : undefined} 
+          disabled={disabled || loading || completed}
+        >
+          Pular etapa
+        </Button>
+
         <Button className="w-full" onClick={handleSubmit(onSubmit)} disabled={disabled || loading || completed}>
           {loading ? (
             <div className="flex items-center gap-2">
@@ -60,6 +70,8 @@ export function StepProfileInput({ onSubmit, disabled, loading, error, completed
             "Buscar posts"
           )}
         </Button>
+
+
 
         <p className="text-sm text-muted-foreground">
           ⏳ Este processo leva em média <strong>3 minutos</strong>, dependendo da quantidade de posts.

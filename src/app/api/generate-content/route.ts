@@ -16,13 +16,13 @@ const openai = new OpenAI({
 });
 
 const RequestSchema = z.object({
-    referenceUsername: z.string(),
+    referenceUsername: z.string().optional(),
     referenceProfile: z.object({
         full_name: z.string().optional(),
         biography: z.string().optional(),
         followers: z.number().optional(),
         profile_url: z.string().optional(),
-    }),
+    }).optional(),
     selectedPosts: z.array(
         z.object({
             caption: z.string(),
@@ -34,7 +34,7 @@ const RequestSchema = z.object({
             image_url: z.string().nullable().optional(),
             video_url: z.string().nullable().optional(),
         }),
-    ),
+    ).optional(),
     goal: z.string(),
     niche: z.string(),
     audience: z.string(),
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
             selectedPosts,
         });
 
-        const postsResumo = selectedPosts
+        const postsResumo = (selectedPosts ?? [])
             .map((post, i) => {
                 const texto = post.transcription
                     ? post.transcription.join(" ").slice(0, 300)
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
             .join("\n");
 
         const hasManyEmptyCaptions =
-            selectedPosts.filter((p) => p.caption === "Sem legenda").length > 1;
+            (selectedPosts ?? []).filter((p) => p.caption === "Sem legenda").length > 1;
 
         let prompt = "";
         if (format === "carrossel") {
@@ -213,9 +213,9 @@ Uma vez recebidas essas informações, entregue o carrossel completo sem mais pe
 
 ## 📄 REFERENCE PROFILE INFORMATION:
 - Name: **${referenceUsername}**
-- Biography: **${referenceProfile.biography || "Não disponível"}**
-- Followers: **${referenceProfile.followers || "?"}**
-- Profile Link: **${referenceProfile.profile_url || "Não informado"}**
+- Biography: **${referenceProfile?.biography || "Não disponível"}**
+- Followers: **${referenceProfile?.followers || "?"}**
+- Profile Link: **${referenceProfile?.profile_url || "Não informado"}**
 
 ---
 
@@ -432,7 +432,7 @@ html
             content: [
                 {
                     caption,
-                    referencePostUrls: selectedPosts.map((p) => p.url),
+                    referencePostUrls: (selectedPosts ?? []).map((p) => p.url),
                 },
             ],
         });

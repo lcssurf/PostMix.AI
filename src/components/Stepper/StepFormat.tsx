@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Badge } from "../ui/badge";
 
 const FORMATS = [
+  { label: "Texto para carrossel", value: "carrossel", featured: true },
   { label: "Roteiro para Reels", value: "reels" },
-  { label: "Legenda para imagem", value: "legenda" },
-  { label: "Texto para carrossel", value: "carrossel" },
-  { label: "Roteiro para TikTok", value: "tiktok" },
-  { label: "Chamada para WhatsApp", value: "whatsapp" },
+  // { label: "Legenda para imagem", value: "legenda" },
+  // { label: "Roteiro para TikTok", value: "tiktok" },
+  // { label: "Chamada para WhatsApp", value: "whatsapp" },
 ];
 
 interface StepFormatProps {
@@ -20,7 +21,7 @@ interface StepFormatProps {
 }
 
 export function StepFormat({ value, onSelect, disabled, completed, loading }: StepFormatProps) {
-  const [tempFormat, setTempFormat] = useState(value || "");
+  const [tempFormat, setTempFormat] = useState(value || "carrossel");
 
   return (
     <div
@@ -41,8 +42,16 @@ export function StepFormat({ value, onSelect, disabled, completed, loading }: St
             )}
             onClick={() => !disabled && !completed && setTempFormat(format.value)}
           >
-            <CardContent className="p-4 text-sm font-medium">
+            <CardContent className="p-4 text-sm font-medium flex items-center gap-2">
               {format.label}
+              {format.featured && (
+              <Badge
+              className="bg-blue-500 text-white dark:bg-blue-600"
+              variant="secondary"
+              >
+                Destaque
+              </Badge>
+              )}
             </CardContent>
           </Card>
         ))}

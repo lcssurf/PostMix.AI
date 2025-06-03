@@ -511,7 +511,28 @@ export default function DashboardPage() {
       .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
   }
 
+const stepKeyToLabel: Record<keyof typeof completedStates, string> = {
+  profile: "Perfil de referência",
+  posts: "Seleção de posts",
+  goal: "Objetivo",
+  niche: "Nicho",
+  audience: "Público-alvo",
+  tone: "Tom de voz",
+  format: "Formato",
+  specificSubject: "Assunto Específico",
+};
 
+const skipStep = (key: keyof typeof completedStates) => {
+  const label = stepKeyToLabel[key];
+  const idx = steps.findIndex((step) => step === label);
+  // if (!isStepEnabled(idx)) {
+  //   console.warn(`🚫 Step ${key} não está habilitado para pular.`);
+  //   return;
+  // }
+
+  setCompletedState(key, true);
+  next();
+};
 
 
 
@@ -579,6 +600,10 @@ export default function DashboardPage() {
             </div> */}
 
             <StepProfileInput
+            skipStep={() => {
+              skipStep("profile")
+              skipStep("posts");
+            }}
               onSubmit={({ competitor }) => {
 
                 if (!isStepEnabled(0) || referenceUsername) return;

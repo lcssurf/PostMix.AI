@@ -1,6 +1,6 @@
 {
-    "name": "rapidlaunch-saas",
-    "version": "0.1.0",
+    "name": "postmix-ai",
+    "version": "0.1.034",
     "private": true,
     "type": "module",
     "scripts": {

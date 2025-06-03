@@ -7,9 +7,9 @@
 export const siteConfig = {
     name: "PostMix.AI",
     description:
-        "Get your startup off the ground quickly with RapidLaunch! This open source Next.js starter kit provides the foundation you need to build your MVP fast – pre-built components, optimized performance, and ready-to-go styling",
+        "O PostMix.ai transforma perfis de referência em conteúdo pronto para o seu Instagram. Mais alcance, mais engajamento, sem precisar quebrar a cabeça com o que postar.",
     orgImage:
-        "https://utfs.io/f/4ae0ddb1-4260-46f5-aa7c-70408cc192b9-aadavt.png",
+        "image.png",
     contactEmail: "lucasidalinor@gmail.com",
     noReplyEmail: "noreply@zanapp.com.br",
 } as const;
