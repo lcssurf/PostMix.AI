@@ -59,16 +59,6 @@ export function StepProfileInput({ onSubmit, disabled, loading, error, completed
           Pular etapa
         </Button>
 
-        <Button
-        variant={'secondary'}
-        className="w-full"
-        onClick={()=>{
-          crawlUser("diegoidalinoribeiro")
-        }}
-        >
-          Teste
-        </Button>
-
         <Button className="w-full" onClick={handleSubmit(onSubmit)} disabled={disabled || loading || completed}>
           {loading ? (
             <div className="flex items-center gap-2">
