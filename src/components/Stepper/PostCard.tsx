@@ -3,6 +3,7 @@ import Image from "next/image";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { ImageIcon, VideoIcon } from "@radix-ui/react-icons"; // Importando os ícones do Radix
+import { InstagramPost } from "@/server/actions/crawler";
 
 export type Post = {
   post_id: string;
@@ -16,18 +17,18 @@ export type Post = {
 };
 
 type PostCardProps = {
-  post: Post;
+  post: InstagramPost;
   selected: boolean;
   toggleSelect: () => void;
   disabled?: boolean;
 };
 
 export function PostCard({ post, selected, toggleSelect, disabled }: PostCardProps) {
-  const isVideo = Boolean(post.videos);
-  const isCarousel = post.photos.length > 1;
-  const isImage = !isVideo && post.photos.length === 1;
+  const isVideo = Boolean(post.reel);
+  const isCarousel = post.images.length > 1;
+  const isImage = !isVideo && post.images.length === 1;
 
-  console.log("PostCard post", post);
+  // console.log("PostCard post", post);
 
   return (
     <div
@@ -40,7 +41,7 @@ export function PostCard({ post, selected, toggleSelect, disabled }: PostCardPro
     >
       <div className="relative w-full aspect-square">
         <Image
-          src={post.photos?.[0] || "/fallback-image.jpg"}
+          src={post.images?.[0] || "/fallback-image.jpg"}
           alt="Post"
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -74,9 +75,9 @@ export function PostCard({ post, selected, toggleSelect, disabled }: PostCardPro
 
         <div className="p-3 space-y-1 text-sm">
           <p className="font-medium line-clamp-2">
-            {post.description || "Sem legenda"}
+            {post.transcription || "Sem legenda"}
           </p>
-          {post.likes !== undefined && (
+          {/* {post.likes !== undefined && (
             <p className="text-xs text-muted-foreground">❤️ {post.likes} curtidas</p>
           )}
           {post.datetime && (
@@ -85,7 +86,7 @@ export function PostCard({ post, selected, toggleSelect, disabled }: PostCardPro
                 locale: ptBR,
               })}
             </p>
-          )}
+          )} */}
         </div>
       </div>
       );

@@ -16,6 +16,9 @@ import { Button } from "@/components/ui/button";
 
 import * as Toast from "@radix-ui/react-toast";
 import { StepSpecificSubject } from "@/components/Stepper/StepSpecificSubject";
+import { crawlUser, InstagramPost } from "@/server/actions/crawler";
+import { successSound } from "@/lib/howler";
+import { Check, Clipboard } from "lucide-react";
 
 
 export default function DashboardPage() {
@@ -125,18 +128,11 @@ export default function DashboardPage() {
   const [showGenerationSuccess, setShowGenerationSuccess] = useState(false);
   const [showGeneratingToast, setShowGeneratingToast] = useState(false);
 
-
-
   const estimatedSeconds = Math.ceil((progressInfo.total - progressInfo.completed) * 2);
   const estimatedMinutes = Math.floor(estimatedSeconds / 60);
   const estimatedRemaining = estimatedMinutes > 0
     ? `${estimatedMinutes} min`
     : `${estimatedSeconds} seg`;
-
-
-
-
-
 
   useEffect(() => {
     console.log("📌 Reference Username:", referenceUsername);
@@ -144,6 +140,13 @@ export default function DashboardPage() {
     console.log("📌 Selected Posts:", selectedPosts);
   }, [referenceUsername, referenceProfile, referencePosts]);
 
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async ({ id }: { id: string }) => {
+    if (!id) return;
+    await navigator.clipboard.writeText(id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const fetchReferenceProfile = async (username: string) => {
     setLoadingState('isLoadingProfile', true);
@@ -169,57 +172,53 @@ export default function DashboardPage() {
 
     const cacheKey = `profile_${sanitized}`;
 
+    // try {
+    //   const cached = sessionStorage.getItem(cacheKey);
+    //   if (cached) {
+    //     const parsed = JSON.parse(cached);
+    //     const now = Date.now();
+    //     const cacheAge = now - (parsed._cachedAt || 0);
+
+    //     if (cacheAge < 24 * 60 * 60 * 1000) { // Cache válido por 24 horas 
+    //       setReferenceProfile(parsed.profile);
+    //       setReferencePosts(parsed.posts);
+    //       setReferenceUsername(sanitized);
+    //       nextIfValid("profile", () => { });
+    //       console.log("🔄 Cache encontrado e válido para:", sanitized);
+    //       setLoadingState('isLoadingProfile', false);
+    //       return;
+    //     } else {
+    //       console.log("🔄 Cache expirado para:", sanitized);
+    //     }
+    //   }
+    // } catch (e) {
+    //   console.warn("⚠️ Erro ao acessar cache:", e);
+    // }
+
     try {
-      const cached = sessionStorage.getItem(cacheKey);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        const now = Date.now();
-        const cacheAge = now - (parsed._cachedAt || 0);
+      // const res = await fetch(`/api/instagram?username=${sanitized}`);
 
-        if (cacheAge < 24 * 60 * 60 * 1000) { // Cache válido por 24 horas 
-          setReferenceProfile(parsed.profile);
-          setReferencePosts(parsed.posts);
-          setReferenceUsername(sanitized);
-          nextIfValid("profile", () => { });
-          console.log("🔄 Cache encontrado e válido para:", sanitized);
-          setLoadingState('isLoadingProfile', false);
-          return;
-        } else {
-          console.log("🔄 Cache expirado para:", sanitized);
-        }
-      }
-    } catch (e) {
-      console.warn("⚠️ Erro ao acessar cache:", e);
-    }
+      const posts = await crawlUser(sanitized);
 
-    try {
-      const res = await fetch(`/api/instagram?username=${sanitized}`);
-
-      const posts = await res.json();
+      // const posts = await res.json();
 
       console.log("📸 Dados do Instagram:", posts);
       // return
 
 
-      if (!Array.isArray(posts)) {
+      if (!Array.isArray(posts.posts) || posts.posts.length === 0) {
         throw new Error("Não conseguimos carregar os posts no momento. O perfil pode ser privado ou ocorreu um problema temporário.");
       }
 
-      if (posts.length === 0) {
-        throw new Error("Não foram encontrados posts nesse perfil.");
-      }
 
-      if (posts[0]?.warning_code === "dead_page") {
-        throw new Error("O perfil informado não foi encontrado. Verifique se o nome de usuário está correto.");
-      }
 
       const profile = {
-        username: posts[0]?.user_posted || sanitized,
-        followers: posts[0]?.followers || null,
-        profile_image_link: posts[0]?.profile_image_link || null,
-        profile_url: posts[0]?.profile_url || `https://www.instagram.com/${sanitized}/`,
-        is_verified: posts[0]?.is_verified || false,
-        posts_count: posts[0]?.posts_count || posts.length,
+        username: posts.username || sanitized,
+        followers: Number(posts.followersCount) || null,
+        profile_image_link: posts.profilePicUrl || null,
+        profile_url: `https://www.instagram.com/${sanitized}/`,
+        // is_verified: posts[0]?.is_verified || false,
+        posts_count: posts.posts.length || 0,
       };
 
       const payload = {
@@ -231,7 +230,7 @@ export default function DashboardPage() {
       localStorage.setItem(cacheKey, JSON.stringify(payload));
 
       setReferenceProfile(profile);
-      setReferencePosts(posts);
+      setReferencePosts(posts.posts || []);
       setReferenceUsername(sanitized);
       nextIfValid("profile", () => { });
     } catch (err: any) {
@@ -337,7 +336,10 @@ export default function DashboardPage() {
         setTimeout(() => {
           generatedRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 300);
-        console.log("✅ Conteúdo gerado:", result);
+        // console.log("✅ Conteúdo gerado:", result);
+        if (!successSound.playing()) {
+          successSound.play();
+        }
         success = true;
       } catch (err: any) {
         console.error(`❌ Erro ao gerar conteúdo (tentativa ${attempt}):`, err);
@@ -365,7 +367,16 @@ export default function DashboardPage() {
 
   const BATCH_SIZE = 3; // controla quantas transcrições simultâneas
 
-  const startTranscription = async (posts: any[]) => {
+  const startTranscription = async (posts: InstagramPost[]) => {
+
+    console.log("📄 Iniciando transcrição de posts:", posts.length);
+    if (posts.length === 0) {
+      console.warn("Nenhum post selecionado para transcrição.");
+      return;
+    }
+    console.log("📄 Posts selecionados para transcrição:", posts.map((p) => p.url).join(", "));
+
+
     setProgressInfo({ completed: 0, total: posts.length });
     setOpen(true);
     setIsTranscribing(true);
@@ -377,24 +388,23 @@ export default function DashboardPage() {
     const MAX_ATTEMPTS = 3;
     const DELAY_BETWEEN_ATTEMPTS = 1000;
 
-    const normalizePostMedia = (post: any) => {
+    const normalizePostMedia = (post: InstagramPost) => {
       const images: string[] = [];
       let video: string | undefined = undefined;
 
-      if (post?.post_content?.length > 0) {
-        const videoItem = post.post_content.find((content: any) => content.type === "Video");
-        if (videoItem) {
-          video = videoItem.url;
-        }
+      if (post?.reel) {
+        return { images, video: post.transcription };
       }
 
-      if (post?.images?.length > 0) {
-        for (const img of post.images) {
-          images.push(img.url);
+      if (post?.images?.length === 1) {
+        if (post.images[0]) {
+          images.push(post.images[0]);
         }
-      } else if (post?.photos?.length > 0) {
-        for (const photo of post.photos) {
-          images.push(photo);
+      } else if (post?.images?.length > 1) {
+        for (const photo of post.images) {
+          if (photo) {
+            images.push(photo);
+          }
         }
       }
 
@@ -459,7 +469,7 @@ export default function DashboardPage() {
         const postTranscriptions: string[] = [];
 
         if (video) {
-          const transcription = await fetchTranscription(undefined, video);
+          const transcription = video //await fetchTranscription(undefined, video);
           if (transcription && transcription !== "Arquivo muito grande para transcrição.") {
             postTranscriptions.push(transcription);
           } else {
@@ -511,38 +521,33 @@ export default function DashboardPage() {
       .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
   }
 
-const stepKeyToLabel: Record<keyof typeof completedStates, string> = {
-  profile: "Perfil de referência",
-  posts: "Seleção de posts",
-  goal: "Objetivo",
-  niche: "Nicho",
-  audience: "Público-alvo",
-  tone: "Tom de voz",
-  format: "Formato",
-  specificSubject: "Assunto Específico",
-};
+  const stepKeyToLabel: Record<keyof typeof completedStates, string> = {
+    profile: "Perfil de referência",
+    posts: "Seleção de posts",
+    goal: "Objetivo",
+    niche: "Nicho",
+    audience: "Público-alvo",
+    tone: "Tom de voz",
+    format: "Formato",
+    specificSubject: "Assunto Específico",
+  };
 
-const skipStep = (key: keyof typeof completedStates) => {
-  const label = stepKeyToLabel[key];
-  const idx = steps.findIndex((step) => step === label);
-  // if (!isStepEnabled(idx)) {
-  //   console.warn(`🚫 Step ${key} não está habilitado para pular.`);
-  //   return;
-  // }
+  const skipStep = (key: keyof typeof completedStates) => {
+    const label = stepKeyToLabel[key];
+    const idx = steps.findIndex((step) => step === label);
+    // if (!isStepEnabled(idx)) {
+    //   console.warn(`🚫 Step ${key} não está habilitado para pular.`);
+    //   return;
+    // }
 
-  setCompletedState(key, true);
-  next();
-};
-
-
-
+    setCompletedState(key, true);
+    next();
+  };
 
   return (
     <AppPageShell title={dashboardPageConfig.title} description={dashboardPageConfig.description}>
 
       <div className="flex flex-col md:flex-row gap-8 mt-6">
-
-
 
         {/* Barra lateral com sticky */}
         <div className="relative">
@@ -600,10 +605,10 @@ const skipStep = (key: keyof typeof completedStates) => {
             </div> */}
 
             <StepProfileInput
-            skipStep={() => {
-              skipStep("profile")
-              skipStep("posts");
-            }}
+              skipStep={() => {
+                skipStep("profile")
+                skipStep("posts");
+              }}
               onSubmit={({ competitor }) => {
 
                 if (!isStepEnabled(0) || referenceUsername) return;
@@ -760,7 +765,7 @@ const skipStep = (key: keyof typeof completedStates) => {
           {generatedContent && (
             <div ref={generatedRef} className="mt-8 space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium">Conteúdos Gerados:</h3>
+                <h3 className="text-lg font-medium">Conteúdo Gerado:</h3>
                 <div className="flex gap-2">
 
                   {/* {connected === null ? (
@@ -807,7 +812,16 @@ const skipStep = (key: keyof typeof completedStates) => {
                       </Button>
                     </a>
                   )} */}
-
+                  <Button
+                    variant="outline"
+                    size="default"
+                    onClick={() => handleCopy({ id: generatedContent[0]?.id || "" })}
+                    title="Copiar ID"
+                    aria-label="Copiar ID para a área de transferência"
+                  >
+                    {copied ? <Check className="w-4 h-4 mr-2" /> : <Clipboard className="w-4 h-4 mr-2" />}
+                    {copied ? "Copiado!" : "Copiar ID"}
+                  </Button>
 
                   <Button
                     variant="outline"
@@ -838,15 +852,21 @@ const skipStep = (key: keyof typeof completedStates) => {
                   <p className="whitespace-pre-wrap text-gray-900 dark:text-gray-100 leading-relaxed">
                     {item.caption}
                   </p>
-                  {item.referencePostUrl && (
-                    <a
-                      href={item.referencePostUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 text-sm underline mt-2 inline-block"
-                    >
-                      Ver post original
-                    </a>
+
+                  {Array.isArray(item.referencePostUrls) && item.referencePostUrls.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {item.referencePostUrls.map((url: string, i: number) => (
+                        <a
+                          key={i}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 text-sm underline"
+                        >
+                          Ver post original {item.referencePostUrls.length > 1 ? `#${i + 1}` : ""}
+                        </a>
+                      ))}
+                    </div>
                   )}
                 </div>
               ))}

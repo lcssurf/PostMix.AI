@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { crawlUser } from "@/server/actions/crawler";
 
 const schema = z.object({
   competitor: z.string().min(2).or(z.literal("")),
@@ -56,6 +57,16 @@ export function StepProfileInput({ onSubmit, disabled, loading, error, completed
           disabled={disabled || loading || completed}
         >
           Pular etapa
+        </Button>
+
+        <Button
+        variant={'secondary'}
+        className="w-full"
+        onClick={()=>{
+          crawlUser("diegoidalinoribeiro")
+        }}
+        >
+          Teste
         </Button>
 
         <Button className="w-full" onClick={handleSubmit(onSubmit)} disabled={disabled || loading || completed}>

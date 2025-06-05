@@ -4,10 +4,11 @@ import { Post, PostCard } from "./PostCard";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
+import { InstagramPost } from "@/server/actions/crawler";
 
 type Props = {
-  posts: Post[];
-  onNext: (selected: Post[]) => void;
+  posts: InstagramPost[] //Post[];
+  onNext: (selected: InstagramPost[]) => void;
   disabled?: boolean;
   completed?: boolean;
   loading?: boolean;
@@ -45,8 +46,8 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
   };
 
   useEffect(() => {
-    console.log("Selected IDs:", selected);
-    console.log("Post IDs:", posts.map((p) => p.post_id));
+    // console.log("Selected IDs:", selected);
+    // console.log("Post IDs:", posts.map((p) => p.url));
     if (selected.length === 3) {
       setTimeout(() => {
         analyzeButtonRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -162,10 +163,10 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
       <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-28">
         {posts?.map((post) => (
           <PostCard
-            key={post.post_id}
+            key={post.url}
             post={post}
-            selected={selected.includes(String(post.post_id))}
-            toggleSelect={() => toggle(post.post_id)}
+            selected={selected.includes(String(post.url))}
+            toggleSelect={() => toggle(post.url)}
             disabled={disabled}
           />
         ))}
@@ -175,7 +176,7 @@ export function StepPostSelection({ posts, onNext, disabled, completed, loading,
         <div className="sticky bottom-0 left-0 w-full bg-white dark:bg-background z-50 px-4 py-3 border-t">
           <Button
             ref={analyzeButtonRef}
-            onClick={() => onNext(posts.filter((p) => selected.includes(String(p.post_id))))}
+            onClick={() => onNext(posts.filter((p) => selected.includes(String(p.url))))}
             disabled={selected.length === 0 || loading || completed}
             className="w-full"
           >

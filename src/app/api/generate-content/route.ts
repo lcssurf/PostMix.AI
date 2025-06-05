@@ -405,8 +405,16 @@ html
 
         const content = extractTextsFromRawContent(caption);
 
+        let saveDB: {
+            id: string;
+            contentType: "carrossel" | "legenda" | "reels" | "tiktok" | "whatsapp";
+            content: unknown;
+            userId: string;
+            createdAt: Date;
+        }[] | null = null;
+        
         try {
-            await saveGeneratedContentMutation({
+            saveDB = await saveGeneratedContentMutation({
                 contentType: format as
                     | "carrossel"
                     | "legenda"
@@ -430,10 +438,11 @@ html
 
         return NextResponse.json({
             content: [
-                {
-                    caption,
-                    referencePostUrls: (selectedPosts ?? []).map((p) => p.url),
-                },
+            {
+                id: saveDB?.[0]?.id,
+                caption,
+                referencePostUrls: (selectedPosts ?? []).map((p) => p.url),
+            },
             ],
         });
     } catch (err: any) {
