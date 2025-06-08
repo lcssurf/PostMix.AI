@@ -393,7 +393,7 @@ export default function DashboardPage() {
       let video: string | undefined = undefined;
 
       if (post?.reel) {
-        return { images, video: post.transcription };
+        return { images, video: post.videoURL };
       }
 
       if (post?.images?.length === 1) {
@@ -469,7 +469,7 @@ export default function DashboardPage() {
         const postTranscriptions: string[] = [];
 
         if (video) {
-          const transcription = video //await fetchTranscription(undefined, video);
+          const transcription = await fetchTranscription(undefined, video); // video
           if (transcription && transcription !== "Arquivo muito grande para transcrição.") {
             postTranscriptions.push(transcription);
           } else {

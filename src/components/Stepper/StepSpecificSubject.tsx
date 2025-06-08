@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Textarea } from "../ui/textarea";
 
 type Props = {
     defaultValue?: string;
@@ -34,12 +35,13 @@ export function StepSpecificSubject({
             <Card>
                 <CardContent className="p-4">
                     <p className="mb-3 text-sm text-muted-foreground">
-                        Sobre qual assunto específico será o conteúdo?
+                        Sobre qual assunto específico será o conteúdo? Detalhe ao máximo: inclua contexto, público-alvo, exemplos, objetivos ou qualquer informação relevante para enriquecer o tema.
                     </p>
-                    <Input
+                    <Textarea
+                        className="h-24"
                         value={subject}
                         onChange={(e) => setSubject(e.target.value)}
-                        placeholder={`Ex.: "5 erros comuns ao investir", "Guia rápido para abrir um MEI"`}
+                        placeholder={`Exemplo: "Como evitar 5 erros comuns ao investir em ações para iniciantes", "Guia prático para abrir um MEI em 2024", "Estratégias para aumentar vendas no Instagram para pequenos negócios"`}
                         disabled={disabled || loading || completed}
                     />
                 </CardContent>
