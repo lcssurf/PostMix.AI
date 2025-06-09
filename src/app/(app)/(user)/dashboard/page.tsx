@@ -205,6 +205,9 @@ export default function DashboardPage() {
       console.log("📸 Dados do Instagram:", posts);
       // return
 
+      if (posts.private){
+        throw new Error("O perfil é privado. Não é possível acessar os posts.");
+      }
 
       if (!Array.isArray(posts.posts) || posts.posts.length === 0) {
         throw new Error("Não conseguimos carregar os posts no momento. O perfil pode ser privado ou ocorreu um problema temporário.");
@@ -219,6 +222,7 @@ export default function DashboardPage() {
         profile_url: `https://www.instagram.com/${sanitized}/`,
         // is_verified: posts[0]?.is_verified || false,
         posts_count: posts.posts.length || 0,
+        private: posts.private || false,
       };
 
       const payload = {

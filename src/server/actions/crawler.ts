@@ -91,21 +91,26 @@ export async function crawlUser(username: string): Promise<InstagramProfile> {
         );
 
         if (data?.fromCache && data?.data) {
-            if (data.notFound) {
-                console.warn(`[CrawlUser] Usuário inexixtente.`);
-                throw new Error(`Usuário ${username} não encontrado. Verifique o nome.`);
-            }
-            if(data.data.posts.length === 0) {
-                console.warn(`[CrawlUser] Usuário encontrado, mas sem posts.`);
-                throw new Error(`Usuário ${username} encontrado, mas não possui posts ou é privado.`);
-            }
+            // if (data.notFound) {
+            //     console.warn(`[CrawlUser] Usuário inexixtente.`);
+            //     throw new Error(`Usuário ${username} não encontrado. Verifique o nome.`);
+            // }
+            // if (data.data.private) {
+            //     console.warn(`[CrawlUser] Usuário encontrado, mas é privado.`);
+            //     throw new Error(`Usuário ${username} é privado. Não é possível acessar os posts.`);
+            // }
+            // if(data.data.posts.length === 0) {
+            //     console.warn(`[CrawlUser] Usuário encontrado, mas sem posts.`);
+            //     throw new Error(`Usuário ${username} encontrado, mas não possui posts ou é privado.`);
+            // }
             console.log(`[CrawlUser] Dados encontrados no cache, retornando.`);
             return data.data as InstagramProfile;
-        } else if (data.status === 'completed' && !data?.data) {
-            console.log(`[CrawlUser] Dados não encontrados após processamento.`);
-            throw new Error(`Dados não encontrados para o usuário ${username}. Tente novamente mais tarde.`);
-        } else if (data.status === 'failed' && !data?.data) {
-            throw new Error(`Dados não encontrados para o usuário ${username}. Tente novamente em alguns segundos.`);
+        // } else if (data.status === 'completed' && !data?.data) {
+        //     console.log(`[CrawlUser] Dados não encontrados após processamento.`);
+        //     throw new Error(`Dados não encontrados para o usuário ${username}. Tente novamente mais tarde.`);
+        //     // Tenta novamente: reinicia o polling sem lançar erro
+        // } else if (data.status === 'failed' && !data?.data) {
+        //     throw new Error(`Dados não encontrados para o usuário ${username}. Tente novamente em alguns segundos.`);
         }
     }
 
