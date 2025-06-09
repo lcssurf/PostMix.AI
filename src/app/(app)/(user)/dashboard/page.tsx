@@ -205,7 +205,7 @@ export default function DashboardPage() {
       console.log("📸 Dados do Instagram:", posts);
       // return
 
-      if (posts.private){
+      if (typeof posts === "object" && "private" in posts && posts.private) {
         throw new Error("O perfil é privado. Não é possível acessar os posts.");
       }
 
