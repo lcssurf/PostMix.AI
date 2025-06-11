@@ -43,6 +43,13 @@
       "when": 1747244667565,
       "tag": "0005_nosy_skullbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1749596498992,
+      "tag": "0006_nappy_amphibian",
+      "breakpoints": true
     }
   ]
 }

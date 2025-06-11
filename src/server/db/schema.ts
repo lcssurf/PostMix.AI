@@ -34,6 +34,39 @@ export const contentTypeEnum = pgEnum("content_type", [
     "tiktok",
     "whatsapp",
 ]);
+
+// //////////////////// CANVA CLONE // //////////////////////
+export const projects = createTable("project", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, {
+      onDelete: "cascade",
+    }),
+  json: text("json").notNull(),
+  height: integer("height").notNull(),
+  width: integer("width").notNull(),
+  thumbnailUrl: text("thumbnailUrl"),
+  isTemplate: boolean("isTemplate"),
+  isPro: boolean("isPro"),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+});
+
+export const projectsRelations = relations(projects, ({ one }) => ({
+  user: one(users, {
+    fields: [projects.userId],
+    references: [users.id],
+  }),
+}));
+
+export const projectsInsertSchema = createInsertSchema(projects);
+
+// ////////////////////
+
 export const generatedContents = createTable("generatedContents", {
     id: varchar("id", { length: 255 })
         .primaryKey()
