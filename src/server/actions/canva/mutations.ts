@@ -18,10 +18,11 @@ const { user } = await protectedProcedure();
         .insert(projects)
         .values({
             name: name,
-            userId: user.id,
+            userId: userId,
             isPro: true,
             ...rest
-        });
+        })
+        .returning();
 
         if (!project) {
             
@@ -31,4 +32,24 @@ const { user } = await protectedProcedure();
         console.log("Project created:", project);
         
     return project;
+}
+
+type UpdateProjectType = Partial<z.infer<typeof projectsInsertSchema>>;
+
+export async function updateProject(id: string, data: UpdateProjectType) {
+  const { user } = await protectedProcedure();
+
+  const updatedProject = await db
+    .update(projects)
+    .set(data)
+    .where(and(eq(projects.id, id), eq(projects.userId, user.id)))
+    .returning();
+
+  if (!updatedProject || updatedProject.length === 0) {
+    throw new Error("Failed to update project");
+  }
+
+  console.log("Project updated:", updatedProject[0]);
+
+  return updatedProject[0];
 }
